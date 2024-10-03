@@ -1,0 +1,40 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Road to Vostok"
+run/main_scene="res://Main.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+boot_splash/bg_color=Color(0, 0, 0, 1)
+boot_splash/image="res://icon.png"
+boot_splash/fullsize=false
+config/icon="res://icon.png"
+
+[dotnet]
+
+project/assembly_name="Road to Vostok"
+
+[editor]
+
+naming/default_signal_callback_name="on_{node_name}_{signal_name}"
+naming/default_signal_callback_to_self_name="on_{signal_name}"
+naming/scene_name_casing=1
+naming/script_name_casing=1
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0, 0, 0, 1)
+
+[vostokmods]
+
+is_injector=true

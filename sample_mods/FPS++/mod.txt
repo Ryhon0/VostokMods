@@ -1,0 +1,4 @@
+[mod]
+name="FPS++"
+id="fps-plus-plus"
+version="0.0.1"

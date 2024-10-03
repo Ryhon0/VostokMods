@@ -1,0 +1,4 @@
+[mod]
+name="Simple Controls"
+id="simple-controls"
+version="0.0.1"
