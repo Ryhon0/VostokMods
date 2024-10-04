@@ -17,7 +17,7 @@ All the extracted resources will be in a binary form, you can use [Godot RE Tool
 Decompiling the GDScript scripts requires [v0.7.0-prerelease.1](https://github.com/bruvzg/gdsdecomp/releases/tag/v0.7.0-prerelease.1) or newer.  
 To create a mod, create a new folder with a file called `mod.txt` and fill it out with information.  
 `mod.txt` uses the [ConfigFile](https://docs.godotengine.org/en/stable/classes/class_configfile.html) format and requires the following fields:
-```
+```toml
 [mod]
 name="Human-readable mod name"
 id="internal-mod-id"
@@ -28,15 +28,44 @@ If a script has a `class_name`, it needs to be removed.
 Files must be in the same relative directory to your mod folder as in the PCK (e.g. `res://Scripts/Character.gd` -> `mod_src/MyMod/Character.gd`).  
 To run the mod, ZIP the contents of your mod so that mod.txt is in the root of the ZIP and put it in the `mods` folder next to the game executable.
 
-### .remap files
-This process may be automated in the future by the build script.  
+### Autoloads
+Mod autoloads let you run scripts when the mod is loaded. They can be defined in the `[autoload]` section in `mod.txt`.  
+The value of a field must be a path to a script inhereting `Node` or a path to a `PackedScene`. The autoload will be added as a child of `/root/` and it's name will be set to the field key.  
+Example autoload section:
+```toml
+[autoload]
+MyModMain="res://MyMod/Main.gd"
+```
 
-A lot of assets will have a `.remap` file, which acts like a symlink. `.remap` files have the following format:
+### Modifying assets
+#### Dynamically
+This method is prefered for modifying scripts, scenes and custom resources as it allows multiple mods to make changes on a single resource. For textures and audio, the static approach might be better but this approach works too.  
+To modify a script, create a script in your mod and extend it using the path to the script you want to modify, instead of it's class name. Then in your mod autoload script, load and compile the script and call `take_over_path()` on your new script with the path of the original script, for example:  
+```gd
+extends "res://Scripts/Weapon.gd"
+
+func PlayFireAudio():
+	base()
+	print("Pew!")
+```
+Autoload script:
+```gd
+func _ready():
+	var script = load("res://MyMod/Weapon.gd")
+	script.reload() # compile the script
+	var parentScript = script.get_base_script()
+	script.take_over_path(parentScript.resource_path)
+	queue_free()
+```
+This process also works for any other asset.
+
+#### Statically
+You can replace assets by having a file with the same path in your mod as the file you want to replace. A lot of assets will have a `.remap` file, which acts like a symlink. `.remap` files have the following format:
 ```
 [remap]
 path="res://path/to/target.file"
 ```
-Mod PCKs can overwrite the `.remap` files. For example, if you want to overwrite the `res://Scripts/Character.gd` file (which is remapped to `res://Scripts/Character.gdc`), you need to create a `Scripts/Character.gd.remap` file, which remaps to another file, e.g. `Scripts/Character.mod.gd`.  
+If you want to replace a file with a `.remap` file, you must create your own `.remap` file, which points to a different path.
 
 ## Sample mods
 These mods are included in the `sample_mods` directory
