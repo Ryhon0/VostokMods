@@ -1,8 +1,12 @@
 extends Node
 
+var loadedMods: Array[ModInfo] = []
+
+signal modLoaded(mod: ModInfo)
+
 class ModInfo:
-	var path : String
-	var cfg : ConfigFile
+	var path: String
+	var cfg: ConfigFile
 
 func getModsDir() -> String:
 	# Get the --main-pack option
@@ -23,14 +27,14 @@ func getModsDir() -> String:
 				continue
 			else:
 				if arg == "--mods-dir":
-					var val = args[i+1]
+					var val = args[i + 1]
 					if val.begins_with("-") || val.begins_with("+"):
 						continue
 					modsDir = val
 					break
 		else:
-			var key = arg.substr(2,idx)
-			var val = arg.substr(idx+1)
+			var key = arg.substr(2, idx)
+			var val = arg.substr(idx + 1)
 			if key == "mods-dir":
 				modsDir = val
 				break
@@ -112,3 +116,6 @@ func _ready():
 					printerr("Autoload '", path, "' defined by mod '", modname, "' does not extend class Node!")
 
 		print("Done")
+
+		loadedMods.append(info)
+		modLoaded.emit(info)
