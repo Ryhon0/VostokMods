@@ -62,6 +62,8 @@ func _ready():
 			continue
 		
 		var cfgStr = zipReader.read_file("mod.txt").get_string_from_utf8()
+		zipReader.close()
+
 		var cfg = ConfigFile.new()
 		var cfgErr = cfg.parse(cfgStr)
 		if cfgErr != OK:
@@ -87,8 +89,26 @@ func _ready():
 		info.cfg = cfg
 		info.path = zipPath
 
-		zipReader.close()
-
-		print("Loading mod \"", modname, "\" (", id, "-", version, ")")
+		print("Loading mod \"", modname, "\" (", id, " ", version, ")")
 		ProjectSettings.load_resource_pack(zipPath)
+
+		if cfg.has_section("autoload"):
+			var entries = cfg.get_section_keys("autoload")
+			for k in entries:
+				var path = cfg.get_value("autoload", k)
+				if !ResourceLoader.exists(path):
+					printerr("Autoload '", path, "' defined by mod '", modname, "' does not exist")
+
+				var autoloadRes = load(path)
+				var node = null
+				if autoloadRes is GDScript:
+					node = autoloadRes.new()
+				elif autoloadRes is PackedScene:
+					node = autoloadRes.instantiate()
+					
+				if node is Node:
+					get_tree().root.add_child(node)
+				else:
+					printerr("Autoload '", path, "' defined by mod '", modname, "' does not extend class Node!")
+
 		print("Done")
