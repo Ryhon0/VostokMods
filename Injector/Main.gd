@@ -146,7 +146,17 @@ Update the injector or verify game files"
 		return
 	
 	var p = load("res://Scripts/Preferences.gd").Load()
+
+	# set_script resets the state, so we need to copy and replicate it
+	var state = {}
+	for prop in p.get_property_list():
+		if prop.usage != 4102: continue
+		if prop.name == "loaderScript": continue
+		state[prop.name] = p.get(prop.name)
 	p.set_script(load("res://ModLoader/SubResourceEntryPoint.gd").duplicate())
+	for k in state.keys():
+		p.set(k, state[k])
+
 	p.loaderScript = load("res://ModLoader/ModLoader.gd").duplicate()
 	p.Save()
 
