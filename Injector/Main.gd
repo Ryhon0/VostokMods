@@ -47,10 +47,17 @@ func _ready() -> void:
 	else: startPCKInjector()
 
 func startSubScriptInjector():
-	var p = load("user://Preferences.tres")
+	# Load the game PCK to access the Perferences script
+	if !ProjectSettings.load_resource_pack(getGameDir() + "/" + pckName):
+		StatusLabel.text = "Failed to load " + pckName + ".
+Update the injector or verify game files"
+		shutdown()
+		return
+	
+	var p = load("res://Scripts/Preferences.gd").Load()
 	p.set_script(load("res://ModLoader/SubResourceEntryPoint.gd").duplicate())
 	p.loaderScript = load("res://ModLoader/ModLoader.gd").duplicate()
-	ResourceSaver.save(p, "user://Preferences.tres")
+	p.Save()
 
 	var pckdir = getGameDir() + "/" + pckName
 	if !FileAccess.file_exists(pckdir):
