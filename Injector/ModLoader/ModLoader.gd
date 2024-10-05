@@ -44,7 +44,7 @@ func getModsDir() -> String:
 
 	if OS.has_feature("editor"):
 		return ProjectSettings.globalize_path("res://") + "/mods"
-	return OS.get_executable_path().get_base_dir() + "/"
+	return OS.get_executable_path().get_base_dir() + "/mods"
 
 func _ready():
 	var modsDir = getModsDir()

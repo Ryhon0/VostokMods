@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Main.gd" id="1_x5slr"]
 
-[node name="Main" type="Control" node_paths=PackedStringArray("StatusLabel", "Progress")]
+[node name="Main" type="Control" node_paths=PackedStringArray("StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "CustomModDirLine")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,10 +10,14 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_x5slr")
-StatusLabel = NodePath("CenterContainer/VBoxContainer/StatusLabel")
-Progress = NodePath("CenterContainer/VBoxContainer/Progress")
+StatusLabel = NodePath("LoadingScreen/VBoxContainer/StatusLabel")
+Progress = NodePath("LoadingScreen/VBoxContainer/Progress")
+LoadingScreen = NodePath("LoadingScreen")
+ConfigScreen = NodePath("ConfigScreen")
+CustomModDirLine = NodePath("ConfigScreen/ScrollContainer/VBoxContainer/GridContainer/HBoxContainer/CustomModDirLine")
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="LoadingScreen" type="CenterContainer" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,16 +25,71 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="LoadingScreen"]
 layout_mode = 2
 
-[node name="StatusLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="StatusLabel" type="Label" parent="LoadingScreen/VBoxContainer"]
 layout_mode = 2
-text = "Starting Road to Vostok"
+text = "Launching Road to Vostok"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Progress" type="ProgressBar" parent="CenterContainer/VBoxContainer"]
+[node name="Progress" type="ProgressBar" parent="LoadingScreen/VBoxContainer"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 max_value = 1.0
+
+[node name="ConfigScreen" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="ConfigScreen"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="GridContainer" type="GridContainer" parent="ConfigScreen/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="ConfigScreen/ScrollContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Custom mod directory"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ConfigScreen/ScrollContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CustomModDirLine" type="LineEdit" parent="ConfigScreen/ScrollContainer/VBoxContainer/GridContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Defaults to (game dir)/mods"
+
+[node name="Button" type="Button" parent="ConfigScreen/ScrollContainer/VBoxContainer/GridContainer/HBoxContainer"]
+layout_mode = 2
+text = "..."
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="ConfigScreen"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Button" type="Button" parent="ConfigScreen/VBoxContainer2"]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Launch"
+
+[connection signal="pressed" from="ConfigScreen/ScrollContainer/VBoxContainer/GridContainer/HBoxContainer/Button" to="." method="openModDirDialog"]
+[connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button" to="." method="injectAndLaunch"]

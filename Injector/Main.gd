@@ -3,6 +3,16 @@ extends Control
 @export var StatusLabel: Label
 @export var Progress: ProgressBar
 
+@export var LoadingScreen : Control
+@export var ConfigScreen : Control
+
+@export var CustomModDirLine : LineEdit
+
+const configPath = "user://ModConfig.json"
+class ModLoaderConfig:
+	var customModDir : String = ""
+var config : ModLoaderConfig = ModLoaderConfig.new()
+
 const githubAPIBaseURL = "https://api.github.com/"
 
 @onready var isWindows = OS.get_name() == "Windows"
@@ -38,9 +48,90 @@ func getGameDir() -> String:
 		return ProjectSettings.globalize_path("res://").get_base_dir().get_base_dir() + "/"
 	return OS.get_executable_path().get_base_dir() + "/"
 
-func _ready() -> void:
-	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED, 0)
+func showLoadingScreen():
+	LoadingScreen.show()
+	ConfigScreen.hide()
 
+func showConfigScreen():
+	ConfigScreen.show()
+	LoadingScreen.hide()
+
+func loadConfig():
+	if !FileAccess.file_exists(configPath):
+		return
+	
+	var f = FileAccess.open(configPath, FileAccess.READ)
+	var obj = JSON.parse_string(f.get_as_text())
+	config = ModLoaderConfig.new()
+	config.customModDir = obj["customModDir"]
+
+	CustomModDirLine.text = config.customModDir
+
+func saveConfig():
+	var jarr = {
+		"customModDir": config.customModDir
+	}
+	var jstr = JSON.stringify(jarr)
+	var f = FileAccess.open(configPath, FileAccess.WRITE)
+	f.store_string(jstr)
+	f.flush()
+	f.close()
+
+func openModDirDialog():
+	var fd = FileDialog.new()
+	fd.access = FileDialog.ACCESS_FILESYSTEM
+	fd.file_mode = FileDialog.FILE_MODE_OPEN_DIR
+	fd.show_hidden_files = true
+	fd.dir_selected.connect(func(dir): CustomModDirLine.text = dir; config.customModDir = dir)
+	add_child(fd)
+	fd.popup_centered_ratio()
+
+func _ready() -> void:
+	loadConfig()
+	CustomModDirLine.text_changed.connect(func(val): config.customModDir = val)
+
+	showLoadingScreen()
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED, 0)
+	launch()
+
+var isLaunching = false
+var launchTimer : Timer
+var launchTween : Tween
+func launch() -> void:
+	isLaunching = true
+	StatusLabel.text = "Launching Road to Vostok
+Press any key to abort or configure"
+	var launchTime = 3.0
+	launchTimer = Timer.new()
+	add_child(launchTimer)
+	launchTimer.timeout.connect(injectAndLaunch)
+	launchTimer.start(launchTime)
+
+	Progress.value = 0.0
+	Progress.max_value = 1.0
+	launchTween = create_tween()
+	launchTween.tween_property(Progress, "value", 1.0, launchTime)
+
+func _input(event: InputEvent) -> void:
+	if !isLaunching:
+		return
+	if event.is_pressed():
+		cancelLaunch()
+		
+func cancelLaunch():
+	launchTimer.stop()
+	launchTimer.queue_free()
+	launchTimer = null
+
+	launchTween.stop()
+	launchTween = null
+
+	isLaunching = false
+	showConfigScreen()
+
+func injectAndLaunch():
+	saveConfig()
+	showLoadingScreen()
 	var useSubScriptInjector = true
 	if useSubScriptInjector:
 		startSubScriptInjector()
@@ -66,6 +157,8 @@ Update the injector or verify game files"
 		return
 
 	var modsDir = getGameDir() + "/mods"
+	if config.customModDir:
+		modsDir = config.customModDir
 	var args = ["--main-pack", pckdir, "--", "--mods-dir", modsDir]
 	args.append(OS.get_cmdline_user_args())
 	
