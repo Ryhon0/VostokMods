@@ -1,5 +1,5 @@
 extends Node
-func _init():
+func _ready():
 	overrideScript("res://FPS++/World.gd")
 	overrideScript("res://FPS++/Camera.gd")
 	queue_free()

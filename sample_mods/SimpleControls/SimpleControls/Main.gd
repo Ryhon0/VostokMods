@@ -1,5 +1,5 @@
 extends Node
-func _init():
+func _ready():
 	overrideScript("res://SimpleControls/Weapon.gd")
 	overrideScript("res://SimpleControls/Character.gd")
 	queue_free()
