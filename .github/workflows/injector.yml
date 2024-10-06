@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  build-linux-x64:
+  injector:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
