@@ -8,13 +8,21 @@ The mod loader can be injected using one of the 2 options:
 Mod PCKs (or ZIPs) will overwrite existing game files at runtime. Partial patches are not supported.  
 
 ## Installation
-This mod loader isn't designed to be installed by end-users yet.  
-For developers, clone the repo, export a PCK for the Injector Godot project, move it to the root of the game installation and run the game executable with `--main-pack (path to Injector.pck)`. You need to run the game at least once for the mod loader to work.  
+* Go to https://github.com/Ryhon0/VostokMods/actions  
+* Click the top most workflow run with the green tick
+* Download the `Injector.pck` file from the "Artifacts" section at the bottom of the page
+* Right click Road to Vostok in your Steam library and select "Manage>Browse local files"
+* Move the downloaded file into the folder
+* Right click Road to Vostok again and select "Properties..."
+* In the "General" tab, set the launch options to `--main-pack Injector.pck`  
+* The mod loader is now installed  
+
+To install mods, move the mod .ZIPs into the `mods` folder in the game directory.  
 
 ## Creating mods
 Download [GodotPckTool](https://github.com/hhyyrylainen/GodotPckTool) to extract the game PCK.  
 All the extracted resources will be in a binary form, you can use [Godot RE Tools](https://github.com/bruvzg/gdsdecomp) to convert them back to usable formats.  
-Decompiling the GDScript scripts requires [v0.7.0-prerelease.1](https://github.com/bruvzg/gdsdecomp/releases/tag/v0.7.0-prerelease.1) or newer.  
+Decompiling the GDScript scripts requires [v0.7.0](https://github.com/bruvzg/gdsdecomp/releases/tag/v0.7.0) or newer.  
 To create a mod, create a new folder with a file called `mod.txt` and fill it out with information.  
 `mod.txt` uses the [ConfigFile](https://docs.godotengine.org/en/stable/classes/class_configfile.html) format and requires the following fields:
 ```toml
@@ -57,6 +65,11 @@ func _ready():
 	script.take_over_path(parentScript.resource_path)
 	queue_free()
 ```
+> [!IMPORTANT]  
+> Due to an issue with Godot, scripts can be overriden ONLY ONCE.  
+> See [godot#83542](https://github.com/godotengine/godot/issues/83542) and [godot-mod-loader#338](https://github.com/GodotModding/godot-mod-loader/issues/338)  
+> We might switch to a hook-based system, which adds PRE and POST function hooks in the future if the issue isn't resolved. ([godot-mod-loader#408](https://github.com/GodotModding/godot-mod-loader/pull/408))
+
 This process also works for any other asset.
 
 #### Statically
