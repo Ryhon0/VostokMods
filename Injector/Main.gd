@@ -94,6 +94,19 @@ func _ready() -> void:
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED, 0)
 	launch()
 
+func getModsDir() -> String:
+	if config.customModDir:
+		print(config.customModDir)
+		return config.customModDir
+	print(getGameDir() + "/mods")
+	return getGameDir() + "/mods"
+
+func openMods() -> void:
+	OS.shell_show_in_file_manager(getModsDir())
+
+func openUser() -> void:
+	OS.shell_show_in_file_manager(OS.get_user_data_dir())
+
 var isLaunching = false
 var launchTimer : Timer
 var launchTween : Tween
@@ -118,7 +131,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_pressed():
 		cancelLaunch()
 		
-func cancelLaunch():
+func cancelLaunch() -> void:
 	launchTimer.stop()
 	launchTimer.queue_free()
 	launchTimer = null
@@ -129,15 +142,15 @@ func cancelLaunch():
 	isLaunching = false
 	showConfigScreen()
 
-func injectAndLaunch():
+func injectAndLaunch(modded: bool = true) -> void:
 	saveConfig()
 	showLoadingScreen()
 	var useSubScriptInjector = true
 	if useSubScriptInjector:
-		startSubScriptInjector()
-	else: startPCKInjector()
+		startSubScriptInjector(modded)
+	else: startPCKInjector(modded)
 
-func startSubScriptInjector():
+func startSubScriptInjector(modded: bool = true) -> void:
 	# Load the game PCK to access the Perferences script
 	if !ProjectSettings.load_resource_pack(getGameDir() + "/" + pckName):
 		StatusLabel.text = "Failed to load " + pckName + ".
@@ -146,6 +159,9 @@ Update the injector or verify game files"
 		return
 	
 	var p = load("res://Scripts/Preferences.gd").Load()
+	var script = load("res://Scripts/Preferences.gd")
+	if modded:
+		script = load("res://ModLoader/SubResourceEntryPoint.gd").duplicate()
 
 	# set_script resets the state, so we need to copy and replicate it
 	var state = {}
@@ -153,11 +169,12 @@ Update the injector or verify game files"
 		if prop.usage != 4102: continue
 		if prop.name == "loaderScript": continue
 		state[prop.name] = p.get(prop.name)
-	p.set_script(load("res://ModLoader/SubResourceEntryPoint.gd").duplicate())
+	p.set_script(script)
 	for k in state.keys():
 		p.set(k, state[k])
 
-	p.loaderScript = load("res://ModLoader/ModLoader.gd").duplicate()
+	if modded:
+		p.loaderScript = load("res://ModLoader/ModLoader.gd").duplicate()
 	p.Save()
 
 	var pckdir = getGameDir() + "/" + pckName
@@ -166,9 +183,7 @@ Update the injector or verify game files"
 		shutdown()
 		return
 
-	var modsDir = getGameDir() + "/mods"
-	if config.customModDir:
-		modsDir = config.customModDir
+	var modsDir = getModsDir()
 	var args = ["--main-pack", pckdir, "--", "--mods-dir", modsDir]
 	args.append(OS.get_cmdline_user_args())
 	
@@ -179,7 +194,7 @@ Update the injector or verify game files"
 		return
 	get_tree().quit()
 
-func startPCKInjector():
+func startPCKInjector(_modded: bool = true) -> void:
 	if (!FileAccess.file_exists(pckToolPath)):
 		StatusLabel.text = "Downloading GodotPCKTool"
 
@@ -196,7 +211,7 @@ func startPCKInjector():
 	else:
 		injectLoaderToPCK()
 
-func pckToolReleasesRequestCompleted(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray):
+func pckToolReleasesRequestCompleted(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS:
 		StatusLabel.text = "Failed to get GodotPCKTool releases"
 		shutdown()
@@ -231,7 +246,7 @@ func pckToolReleasesRequestCompleted(result: int, response_code: int, _headers: 
 	showHttpProgress(httpReq)
 	httpReq.request_completed.connect(pckToolDownloadRequestCompleted)
 
-func pckToolDownloadRequestCompleted(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray):
+func pckToolDownloadRequestCompleted(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS:
 		StatusLabel.text = "Failed to download GodotPCKTool"
 		shutdown()
@@ -253,7 +268,7 @@ func pckToolDownloadRequestCompleted(result: int, response_code: int, _headers: 
 	
 	injectLoaderToPCK()
 		
-func injectLoaderToPCK():
+func injectLoaderToPCK() -> void:
 	StatusLabel.text = "Injecting mod loader"
 	Progress.value = 0
 	Progress.max_value = 1

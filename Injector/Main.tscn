@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://b6nywv6aqxm3r"]
+[gd_scene load_steps=3 format=3 uid="uid://b6nywv6aqxm3r"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_x5slr"]
+[ext_resource type="Texture2D" uid="uid://wbaqykif8euy" path="res://icon.svg" id="2_74yqq"]
 
 [node name="Main" type="Control" node_paths=PackedStringArray("StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "CustomModDirLine")]
 layout_mode = 3
@@ -14,7 +15,7 @@ StatusLabel = NodePath("LoadingScreen/VBoxContainer/StatusLabel")
 Progress = NodePath("LoadingScreen/VBoxContainer/Progress")
 LoadingScreen = NodePath("LoadingScreen")
 ConfigScreen = NodePath("ConfigScreen")
-CustomModDirLine = NodePath("ConfigScreen/ScrollContainer/VBoxContainer/GridContainer/HBoxContainer/CustomModDirLine")
+CustomModDirLine = NodePath("ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer/CustomModDirLine")
 
 [node name="LoadingScreen" type="CenterContainer" parent="."]
 visible = false
@@ -47,43 +48,110 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="ConfigScreen"]
+[node name="TabContainer" type="TabContainer" parent="ConfigScreen"]
 layout_mode = 2
 size_flags_horizontal = 3
+current_tab = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/ScrollContainer"]
+[node name="Settings" type="ScrollContainer" parent="ConfigScreen/TabContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+metadata/_tab_index = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/TabContainer/Settings"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="GridContainer" type="GridContainer" parent="ConfigScreen/ScrollContainer/VBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="ConfigScreen/TabContainer/Settings/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/h_separation = 16
 columns = 2
 
-[node name="Label" type="Label" parent="ConfigScreen/ScrollContainer/VBoxContainer/GridContainer"]
+[node name="Label" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
 layout_mode = 2
 text = "Custom mod directory"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ConfigScreen/ScrollContainer/VBoxContainer/GridContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CustomModDirLine" type="LineEdit" parent="ConfigScreen/ScrollContainer/VBoxContainer/GridContainer/HBoxContainer"]
+[node name="CustomModDirLine" type="LineEdit" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Defaults to (game dir)/mods"
 
-[node name="Button" type="Button" parent="ConfigScreen/ScrollContainer/VBoxContainer/GridContainer/HBoxContainer"]
+[node name="Button" type="Button" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer"]
 layout_mode = 2
 text = "..."
+
+[node name="Label2" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Start on config screen"
+
+[node name="CheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Mods" type="ScrollContainer" parent="ConfigScreen/TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="ModListTree" type="Tree" parent="ConfigScreen/TabContainer/Mods"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="ConfigScreen"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/VBoxContainer2"]
+[node name="CenterContainer" type="CenterContainer" parent="ConfigScreen/VBoxContainer2"]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/VBoxContainer2/CenterContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="ConfigScreen/VBoxContainer2/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 128)
+layout_mode = 2
+texture = ExtResource("2_74yqq")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="ConfigScreen/VBoxContainer2/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "VostokMods Injector"
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="ConfigScreen/VBoxContainer2/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.5)
+text = "Version x.x.x"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ConfigScreen/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="ConfigScreen/VBoxContainer2/HBoxContainer"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Open mods"
+
+[node name="Button2" type="Button" parent="ConfigScreen/VBoxContainer2/HBoxContainer"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Open user://"
+
+[node name="Button3" type="Button" parent="ConfigScreen/VBoxContainer2"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Launch without mods"
 
 [node name="Button" type="Button" parent="ConfigScreen/VBoxContainer2"]
 custom_minimum_size = Vector2(0, 96)
@@ -91,5 +159,8 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Launch"
 
-[connection signal="pressed" from="ConfigScreen/ScrollContainer/VBoxContainer/GridContainer/HBoxContainer/Button" to="." method="openModDirDialog"]
+[connection signal="pressed" from="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer/Button" to="." method="openModDirDialog"]
+[connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/Button" to="." method="openMods"]
+[connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/Button2" to="." method="openUser"]
+[connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button3" to="." method="injectAndLaunch" binds= [false]]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button" to="." method="injectAndLaunch"]
