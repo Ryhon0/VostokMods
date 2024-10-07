@@ -1,17 +1,44 @@
 extends Control
 
+@export var VersionLabel : Label
 @export var StatusLabel: Label
 @export var Progress: ProgressBar
 
 @export var LoadingScreen : Control
 @export var ConfigScreen : Control
 
-@export var CustomModDirLine : LineEdit
+@export var SettingsPage : Control
 
 const configPath = "user://ModConfig.json"
 class ModLoaderConfig:
 	var customModDir : String = ""
+	var startOnConfigScreen : bool = false
 var config : ModLoaderConfig = ModLoaderConfig.new()
+
+func loadConfig():
+	if !FileAccess.file_exists(configPath):
+		return
+	
+	var f = FileAccess.open(configPath, FileAccess.READ)
+	var obj = JSON.parse_string(f.get_as_text())
+	config = ModLoaderConfig.new()
+	if "customModDir" in obj:
+		config.customModDir = obj["customModDir"]
+	if "startOnConfigScreen" in obj:
+		config.startOnConfigScreen = obj["startOnConfigScreen"]
+
+	SettingsPage.onLoaded()
+
+func saveConfig():
+	var jarr = {
+		"customModDir": config.customModDir,
+		"startOnConfigScreen": config.startOnConfigScreen
+	}
+	var jstr = JSON.stringify(jarr)
+	var f = FileAccess.open(configPath, FileAccess.WRITE)
+	f.store_string(jstr)
+	f.flush()
+	f.close()
 
 const githubAPIBaseURL = "https://api.github.com/"
 
@@ -56,43 +83,20 @@ func showConfigScreen():
 	ConfigScreen.show()
 	LoadingScreen.hide()
 
-func loadConfig():
-	if !FileAccess.file_exists(configPath):
-		return
-	
-	var f = FileAccess.open(configPath, FileAccess.READ)
-	var obj = JSON.parse_string(f.get_as_text())
-	config = ModLoaderConfig.new()
-	config.customModDir = obj["customModDir"]
-
-	CustomModDirLine.text = config.customModDir
-
-func saveConfig():
-	var jarr = {
-		"customModDir": config.customModDir
-	}
-	var jstr = JSON.stringify(jarr)
-	var f = FileAccess.open(configPath, FileAccess.WRITE)
-	f.store_string(jstr)
-	f.flush()
-	f.close()
-
-func openModDirDialog():
-	var fd = FileDialog.new()
-	fd.access = FileDialog.ACCESS_FILESYSTEM
-	fd.file_mode = FileDialog.FILE_MODE_OPEN_DIR
-	fd.show_hidden_files = true
-	fd.dir_selected.connect(func(dir): CustomModDirLine.text = dir; config.customModDir = dir)
-	add_child(fd)
-	fd.popup_centered_ratio()
-
 func _ready() -> void:
 	loadConfig()
-	CustomModDirLine.text_changed.connect(func(val): config.customModDir = val)
 
-	showLoadingScreen()
+	var f = FileAccess.open("res://VM_VERSION", FileAccess.READ)
+	VersionLabel.text = "Version " + f.get_as_text()
+	f.close()
+
+	if config.startOnConfigScreen:
+		showConfigScreen()
+	else:
+		showLoadingScreen()
+		launch()
+
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED, 0)
-	launch()
 
 func getModsDir() -> String:
 	if config.customModDir:
