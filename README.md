@@ -8,9 +8,8 @@ The mod loader can be injected using one of the 2 options:
 Mod PCKs (or ZIPs) will overwrite existing game files at runtime. Partial patches are not supported.  
 
 ## Installation
-* Go to https://github.com/Ryhon0/VostokMods/actions  
-* Click the top most workflow run with the green tick
-* Download the `Injector.pck` file from the "Artifacts" section at the bottom of the page
+* Go to the [releases page](https://github.com/Ryhon0/VostokMods/releases)  
+* Download the `Injector.pck` file from the latest release  
 * Right click Road to Vostok in your Steam library and select "Manage>Browse local files"
 * Move the downloaded file into the folder
 * Right click Road to Vostok again and select "Properties..."
