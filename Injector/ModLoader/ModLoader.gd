@@ -55,6 +55,14 @@ func _ready():
 	var da = DirAccess.open(modsDir)
 	for mod in da.get_files():
 		var zipPath = modsDir + "/" + mod
+
+		if mod.ends_with(".zip.disabled"):
+			continue
+		elif mod.ends_with(".zip"):
+			print("Loading ", zipPath)
+		else:
+			continue
+
 		var zipReader = ZIPReader.new()
 		var err = zipReader.open(zipPath)
 		if err != OK:

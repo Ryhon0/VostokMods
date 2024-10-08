@@ -5,7 +5,7 @@ extends Control
 @export var StartOnConfigCheckBox : CheckBox
 
 func _ready() -> void:
-	CustomModDirLine.text_changed.connect(func(val): Main.config.customModDir = val)
+	CustomModDirLine.text_changed.connect(func(val): Main.config.customModDir = val; Main.ModList.dirty = true)
 	StartOnConfigCheckBox.toggled.connect(func(val): Main.config.startOnConfigScreen = val)
 
 func openModDirDialog():
@@ -13,7 +13,7 @@ func openModDirDialog():
 	fd.access = FileDialog.ACCESS_FILESYSTEM
 	fd.file_mode = FileDialog.FILE_MODE_OPEN_DIR
 	fd.show_hidden_files = true
-	fd.dir_selected.connect(func(dir): CustomModDirLine.text = dir; Main.config.customModDir = dir)
+	fd.dir_selected.connect(func(dir): CustomModDirLine.text = dir; Main.config.customModDir = dir; Main.ModList.dirty = true)
 	add_child(fd)
 	fd.popup_centered_ratio()
 

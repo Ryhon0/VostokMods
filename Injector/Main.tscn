@@ -1,10 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://b6nywv6aqxm3r"]
+[gd_scene load_steps=5 format=3 uid="uid://b6nywv6aqxm3r"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_x5slr"]
 [ext_resource type="Texture2D" uid="uid://wbaqykif8euy" path="res://icon.svg" id="2_74yqq"]
 [ext_resource type="Script" path="res://Settings.gd" id="2_b0jil"]
+[ext_resource type="Script" path="res://ModList.gd" id="3_xyy35"]
 
-[node name="Main" type="Control" node_paths=PackedStringArray("VersionLabel", "StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "SettingsPage")]
+[node name="Main" type="Control" node_paths=PackedStringArray("VersionLabel", "StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "SettingsPage", "ModList")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,6 +19,7 @@ Progress = NodePath("LoadingScreen/VBoxContainer/Progress")
 LoadingScreen = NodePath("LoadingScreen")
 ConfigScreen = NodePath("ConfigScreen")
 SettingsPage = NodePath("ConfigScreen/TabContainer/Settings")
+ModList = NodePath("ConfigScreen/TabContainer/Mods")
 
 [node name="LoadingScreen" type="CenterContainer" parent="."]
 visible = false
@@ -99,15 +101,23 @@ text = "Start on config screen"
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="Mods" type="ScrollContainer" parent="ConfigScreen/TabContainer"]
+[node name="Mods" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "List")]
 visible = false
 layout_mode = 2
+script = ExtResource("3_xyy35")
+Main = NodePath("../../..")
+List = NodePath("ModListTree")
 metadata/_tab_index = 1
 
 [node name="ModListTree" type="Tree" parent="ConfigScreen/TabContainer/Mods"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+columns = 5
+column_titles_visible = true
+hide_root = true
+select_mode = 1
+scroll_horizontal_enabled = false
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="ConfigScreen"]
 custom_minimum_size = Vector2(300, 0)
@@ -166,7 +176,10 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Launch"
 
+[connection signal="tab_changed" from="ConfigScreen/TabContainer" to="ConfigScreen/TabContainer/Mods" method="tabChanged"]
 [connection signal="pressed" from="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer/Button" to="ConfigScreen/TabContainer/Settings" method="openModDirDialog"]
+[connection signal="column_title_clicked" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="titleClicked"]
+[connection signal="item_edited" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="itemEdited"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/Button" to="." method="openMods"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/Button2" to="." method="openUser"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button3" to="." method="injectAndLaunch" binds= [false]]

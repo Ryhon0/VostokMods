@@ -8,6 +8,7 @@ extends Control
 @export var ConfigScreen : Control
 
 @export var SettingsPage : Control
+@export var ModList : Control
 
 const configPath = "user://ModConfig.json"
 class ModLoaderConfig:
@@ -100,9 +101,7 @@ func _ready() -> void:
 
 func getModsDir() -> String:
 	if config.customModDir:
-		print(config.customModDir)
 		return config.customModDir
-	print(getGameDir() + "/mods")
 	return getGameDir() + "/mods"
 
 func openMods() -> void:

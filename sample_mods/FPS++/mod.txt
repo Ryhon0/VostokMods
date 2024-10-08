@@ -4,4 +4,4 @@ id="fps-plus-plus"
 version="0.0.1"
 
 [autoload]
-0="res://FPS++/Main.gd"
+0="res://mods/FPS++/Main.gd"

@@ -1,7 +1,7 @@
 extends Node
 func _ready():
-	overrideScript("res://SimpleControls/Weapon.gd")
-	overrideScript("res://SimpleControls/Character.gd")
+	overrideScript("res://mods/SimpleControls/Weapon.gd")
+	overrideScript("res://mods/SimpleControls/Character.gd")
 	queue_free()
 
 func overrideScript(overrideScriptPath : String):
