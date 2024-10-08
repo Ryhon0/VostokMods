@@ -313,3 +313,6 @@ func hashPCK(path):
 	var res = ctx.finish()
 	# Print the result as hex string and array.
 	return res.hex_encode()
+
+func openDonatePage():
+	OS.shell_open("https://github.com/sponsors/Ryhon0")

@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://b6nywv6aqxm3r"]
+[gd_scene load_steps=6 format=3 uid="uid://b6nywv6aqxm3r"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_x5slr"]
 [ext_resource type="Texture2D" uid="uid://wbaqykif8euy" path="res://icon.svg" id="2_74yqq"]
 [ext_resource type="Script" path="res://Settings.gd" id="2_b0jil"]
 [ext_resource type="Script" path="res://ModList.gd" id="3_xyy35"]
+[ext_resource type="Texture2D" uid="uid://bcc6fhil26kqe" path="res://donate_icon.png" id="5_r2nj5"]
 
 [node name="Main" type="Control" node_paths=PackedStringArray("VersionLabel", "StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "SettingsPage", "ModList")]
 layout_mode = 3
@@ -149,6 +150,31 @@ theme_override_colors/font_color = Color(1, 1, 1, 0.5)
 text = "Version x.x.x"
 horizontal_alignment = 1
 
+[node name="Button2" type="Button" parent="ConfigScreen/VBoxContainer2"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+expand_icon = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ConfigScreen/VBoxContainer2/Button2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="ConfigScreen/VBoxContainer2/Button2/HBoxContainer"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+texture = ExtResource("5_r2nj5")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="ConfigScreen/VBoxContainer2/Button2/HBoxContainer"]
+layout_mode = 2
+text = "Donate"
+
 [node name="HBoxContainer" type="HBoxContainer" parent="ConfigScreen/VBoxContainer2"]
 layout_mode = 2
 
@@ -180,6 +206,7 @@ text = "Launch"
 [connection signal="pressed" from="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer/Button" to="ConfigScreen/TabContainer/Settings" method="openModDirDialog"]
 [connection signal="column_title_clicked" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="titleClicked"]
 [connection signal="item_edited" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="itemEdited"]
+[connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button2" to="." method="openDonatePage"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/Button" to="." method="openMods"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/Button2" to="." method="openUser"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button3" to="." method="injectAndLaunch" binds= [false]]
