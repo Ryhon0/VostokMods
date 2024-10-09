@@ -1,0 +1,7 @@
+[mod]
+name="Lightly Weathered"
+id="lightly-weathered"
+version="1.0.0"
+
+[autoload]
+0="res://mods/LightlyWeathered/Main.gd"
