@@ -3,6 +3,7 @@ extends Node
 var loadedMods: Array[ModInfo] = []
 
 signal modLoaded(mod: ModInfo)
+signal allModsLoaded()
 
 class ModInfo:
 	var path: String
@@ -126,6 +127,7 @@ func _ready():
 					printerr("Autoload '", path, "' defined by mod '", modname, "' does not extend class Node!")
 
 		print("Done")
+		allModsLoaded.emit()
 
 		loadedMods.append(info)
 		modLoaded.emit(info)
