@@ -120,6 +120,8 @@ func _ready():
 					
 				if node is Node:
 					get_tree().root.add_child(node)
+					node.name = k
+					print("Created autoload ", k, " defined by mod '", modname, "'")
 				else:
 					printerr("Autoload '", path, "' defined by mod '", modname, "' does not extend class Node!")
 
