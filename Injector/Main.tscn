@@ -1,12 +1,13 @@
-[gd_scene load_steps=6 format=3 uid="uid://b6nywv6aqxm3r"]
+[gd_scene load_steps=7 format=3 uid="uid://b6nywv6aqxm3r"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_x5slr"]
 [ext_resource type="Texture2D" uid="uid://wbaqykif8euy" path="res://icon.svg" id="2_74yqq"]
 [ext_resource type="Script" path="res://Settings.gd" id="2_b0jil"]
 [ext_resource type="Script" path="res://ModList.gd" id="3_xyy35"]
 [ext_resource type="Texture2D" uid="uid://bcc6fhil26kqe" path="res://donate_icon.png" id="5_r2nj5"]
+[ext_resource type="Script" path="res://AutoUpdater.gd" id="6_etu4i"]
 
-[node name="Main" type="Control" node_paths=PackedStringArray("VersionLabel", "StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "SettingsPage", "ModList")]
+[node name="Main" type="Control" node_paths=PackedStringArray("VersionLabel", "StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "SettingsPage", "Mods", "Updater")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,7 +21,8 @@ Progress = NodePath("LoadingScreen/VBoxContainer/Progress")
 LoadingScreen = NodePath("LoadingScreen")
 ConfigScreen = NodePath("ConfigScreen")
 SettingsPage = NodePath("ConfigScreen/TabContainer/Settings")
-ModList = NodePath("ConfigScreen/TabContainer/Mods")
+Mods = NodePath("ConfigScreen/TabContainer/Mods")
+Updater = NodePath("AutoUpdater")
 
 [node name="LoadingScreen" type="CenterContainer" parent="."]
 visible = false
@@ -46,6 +48,7 @@ layout_mode = 2
 max_value = 1.0
 
 [node name="ConfigScreen" type="HBoxContainer" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -201,6 +204,10 @@ custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Launch"
+
+[node name="AutoUpdater" type="Node" parent="." node_paths=PackedStringArray("Main")]
+script = ExtResource("6_etu4i")
+Main = NodePath("..")
 
 [connection signal="tab_changed" from="ConfigScreen/TabContainer" to="ConfigScreen/TabContainer/Mods" method="tabChanged"]
 [connection signal="pressed" from="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer/Button" to="ConfigScreen/TabContainer/Settings" method="openModDirDialog"]

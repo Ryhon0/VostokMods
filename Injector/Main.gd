@@ -1,4 +1,5 @@
 extends Control
+class_name InjectorMain
 
 @export var VersionLabel : Label
 @export var StatusLabel: Label
@@ -8,12 +9,16 @@ extends Control
 @export var ConfigScreen : Control
 
 @export var SettingsPage : Control
-@export var ModList : Control
+@export var Mods : ModList
+@export var Updater : AutoUpdater
+
+var version
 
 const configPath = "user://ModConfig.json"
 class ModLoaderConfig:
 	var customModDir : String = ""
 	var startOnConfigScreen : bool = false
+	var autoUpdatePreRelease : bool = false
 var config : ModLoaderConfig = ModLoaderConfig.new()
 
 func loadConfig():
@@ -27,13 +32,16 @@ func loadConfig():
 		config.customModDir = obj["customModDir"]
 	if "startOnConfigScreen" in obj:
 		config.startOnConfigScreen = obj["startOnConfigScreen"]
+	if "autoUpdatePreRelease" in obj:
+		config.autoUpdatePreRelease = obj["autoUpdatePreRelease"]
 
 	SettingsPage.onLoaded()
 
 func saveConfig():
 	var jarr = {
 		"customModDir": config.customModDir,
-		"startOnConfigScreen": config.startOnConfigScreen
+		"startOnConfigScreen": config.startOnConfigScreen,
+		"autoUpdatePreRelease": config.autoUpdatePreRelease
 	}
 	var jstr = JSON.stringify(jarr)
 	var f = FileAccess.open(configPath, FileAccess.WRITE)
@@ -88,9 +96,17 @@ func _ready() -> void:
 	loadConfig()
 
 	var f = FileAccess.open("res://VM_VERSION", FileAccess.READ)
-	VersionLabel.text = "Version " + f.get_as_text()
+	version = f.get_as_text()
+	VersionLabel.text = "Version " + version
 	f.close()
 
+	Mods.loadMods()
+	showLoadingScreen()
+	if !OS.has_feature("editor"):
+		Updater.checkInjectorUpdate()
+	else: launchOrShowConfig()
+
+func launchOrShowConfig():
 	if config.startOnConfigScreen:
 		showConfigScreen()
 	else:
@@ -190,7 +206,7 @@ Update the injector or verify game files"
 	var args = ["--main-pack", pckdir, "--", "--mods-dir", modsDir]
 	args.append(OS.get_cmdline_user_args())
 	
-	var pid = OS.create_process(OS.get_executable_path(), args, true)
+	var pid = OS.create_process(OS.get_executable_path(), args, false)
 	if pid == -1:
 		StatusLabel.text = "Failed to start Road to Vostok"
 		shutdown()
