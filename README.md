@@ -81,8 +81,8 @@ If you want to replace a file with a `.remap` file, you must create your own `.r
 
 ## Sample mods
 These mods are included in the `sample_mods` directory
-### FPS++
-Disables 4xMSAA in performance mode, FSR 2.2 is enabled and resolution scale can be adjusted with up/down arrow keys.  
+### LightlyWeathered
+Time, weather and music changes when entering a new zone.  
 ## SimpleControls
 Simplifies the controls.  
 Weapon is always ready when not sprinting, arm stamina is only consumed while aiming.  Bolt- and pump- action weapons automatically chamber next round and reload automatically with a single reload button press.
