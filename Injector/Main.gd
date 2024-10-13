@@ -103,8 +103,8 @@ func _ready() -> void:
 	Mods.loadMods()
 	showLoadingScreen()
 	if !OS.has_feature("editor"):
-		Updater.checkInjectorUpdate()
-	else: launchOrShowConfig()
+		await Updater.checkInjectorUpdate()
+	else: await Updater.checkModUpdates()
 
 func launchOrShowConfig():
 	if config.startOnConfigScreen:
