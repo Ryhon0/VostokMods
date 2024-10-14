@@ -120,8 +120,8 @@ func _ready():
 					node = autoloadRes.instantiate()
 					
 				if node is Node:
-					get_tree().root.add_child(node)
 					node.name = k
+					get_tree().root.add_child(node)
 					print("Created autoload ", k, " defined by mod '", modname, "'")
 				else:
 					printerr("Autoload '", path, "' defined by mod '", modname, "' does not extend class Node!")
