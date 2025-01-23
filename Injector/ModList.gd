@@ -8,6 +8,7 @@ var mods : Array[ModInfo] = []
 class ModInfo:
 	var zipPath : String
 	var config : ConfigFile
+	var disabled : bool
 
 func _ready():
 	List.set_column_title(0, "Name")
@@ -66,6 +67,7 @@ func loadMods():
 		var modi = ModInfo.new()
 		modi.config = cfg
 		modi.zipPath = modsdir.path_join(zipname)
+		modi.disabled = disabled
 		mods.append(modi)
 
 		var li = List.create_item()

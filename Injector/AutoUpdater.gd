@@ -145,6 +145,8 @@ func checkModUpdates():
 	var updatableMods = []
 	var mwsIds = []
 	for mod in Main.Mods.mods:
+		if mod.disabled:
+			continue
 		if mod.config.has_section_key("updates", "modworkshop"):
 			updatableMods.append(mod)
 			mwsIds.append(mod.config.get_value("updates", "modworkshop"))
