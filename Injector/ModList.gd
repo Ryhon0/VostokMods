@@ -3,25 +3,75 @@ class_name ModList
 
 @export var Main: Control
 @export var List: Tree
+
+@export var PinIcon: Texture2D
+@export var PinIconDisabled: Texture2D
+
 var mods : Array[ModInfo] = []
 
 class ModInfo:
 	var zipPath : String
 	var config : ConfigFile
 	var disabled : bool
+	var versionPinned : bool
+
+	func makeDisabled(disable: bool):
+		var from = zipPath + ".zip"
+		var to = zipPath + ".zip"
+
+		if disable: to += ".disabled"
+		else: from += ".disabled"
+
+		var err = DirAccess.rename_absolute(from, to)
+		if err != OK:
+			OS.alert("Could not move file " + from + " to " + to + ". Error " + err)
+			return
+		
+		disabled = disable
+	
+	func pinVersion(pin: bool):
+		if !pin:
+			var err = DirAccess.remove_absolute(zipPath + ".dontupdate")
+			if err != OK:
+				OS.alert("Could remove file " + zipPath + ".dontupdate. Error " + err)
+				return
+			versionPinned = pin
+		else:
+			var f = FileAccess.open(zipPath + ".dontupdate", FileAccess.ModeFlags.WRITE)
+			var err = FileAccess.get_open_error()
+
+			if err != OK:
+				OS.alert("Failed to create file " + zipPath + ".dontupdate. Error " + err)
+				return
+
+			f.store_string("")
+			f.close()
+
+			err = f.get_error()
+			if err != OK:
+				OS.alert("Failed to save file " + zipPath + ".dontupdate. Error " + err)
+				return
+
+			versionPinned = pin
+
+const VERSION_COLUMN = 2
+const VERSION_COLUMN_BUTTON_PIN = 0
+
+const ENABLED_COLUMN = 4
 
 func _ready():
 	List.set_column_title(0, "Name")
 	List.set_column_title(1, "ID")
-	List.set_column_title(2, "Version")
+	List.set_column_title(VERSION_COLUMN, "Version")
 	List.set_column_title(3, "File name")
-	List.set_column_title(4, "Enabled")
+	List.set_column_title(ENABLED_COLUMN, "Enabled")
 
 	for i in range(List.columns):
 		List.set_column_expand(i, false)
 
 	List.set_column_expand(0, true)
 	List.set_column_custom_minimum_width(1, 175)
+	List.set_column_custom_minimum_width(VERSION_COLUMN, 75)
 	List.set_column_custom_minimum_width(3, 175)
 
 func loadMods():
@@ -45,6 +95,7 @@ func loadMods():
 			disabled = false
 		else:
 			continue
+		var pinned = FileAccess.file_exists(modsdir.path_join(zipname) + ".dontupdate")
 		
 		var zr = ZIPReader.new()
 		if zr.open(modsdir.path_join(f)) != OK:
@@ -68,35 +119,39 @@ func loadMods():
 		modi.config = cfg
 		modi.zipPath = modsdir.path_join(zipname)
 		modi.disabled = disabled
+		modi.versionPinned = pinned
 		mods.append(modi)
 
 		var li = List.create_item()
-		li.set_meta("filename", zipname)
+		li.set_meta("mod", modi)
 
 		li.set_text(0, modname)
 		li.set_text(1, modid)
-		li.set_text(2, modver)
+		li.set_text(VERSION_COLUMN, modver)
 		li.set_text(3, zipname)
-		li.set_cell_mode(List.columns - 1, TreeItem.CELL_MODE_CHECK)
-		li.set_checked(List.columns - 1, !disabled)
-		li.set_editable(List.columns - 1, true)
+		
+		# Mod disalbed
+		li.set_cell_mode(ENABLED_COLUMN, TreeItem.CELL_MODE_CHECK)
+		li.set_checked(ENABLED_COLUMN, !disabled)
+		li.set_editable(ENABLED_COLUMN, true)
+
+		# Pin version
+		li.add_button(VERSION_COLUMN, PinIcon if pinned else PinIconDisabled, VERSION_COLUMN_BUTTON_PIN, false, "Pin version")
+
+func buttonPressed(item: TreeItem, column: int, button: int, mousebtn: int) -> void:
+	if column == VERSION_COLUMN && button == VERSION_COLUMN_BUTTON_PIN:
+		if mousebtn == MOUSE_BUTTON_LEFT:
+			var mod : ModInfo = item.get_meta("mod")
+			mod.pinVersion(!mod.versionPinned)
+			item.set_button(VERSION_COLUMN, VERSION_COLUMN_BUTTON_PIN, PinIcon if mod.versionPinned else PinIconDisabled)
+			return
 
 func itemEdited() -> void:
-	if List.get_edited_column() != List.columns - 1:
-		return
-
-	var item: TreeItem = List.get_edited()
-	var disabled = item.is_checked(List.columns - 1)
-	var file = Main.getModsDir().path_join(item.get_meta("filename"))
-
-	var from = file + ".zip"
-	var to = file + ".zip"
-	if disabled: from += ".disabled"
-	else: to += ".disabled"
-
-			
-	if DirAccess.rename_absolute(from, to) != OK:
-		OS.alert("Could not move file " + from)
+	if List.get_edited_column() == 4:
+		var item: TreeItem = List.get_edited()
+		var modi: ModInfo = item.get_meta("mod")
+		modi.makeDisabled(!modi.disabled)
+		item.set_checked(ENABLED_COLUMN, modi.disabled)
 
 func titleClicked(col: int, mouse: int) -> void:
 	if mouse != MOUSE_BUTTON_LEFT:

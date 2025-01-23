@@ -21,6 +21,7 @@ class ModLoaderConfig:
 	var autoUpdatePreRelease : bool = false
 	var allowAutoUpdate: bool = true
 	var allowModAutoUpdates: bool = true
+	var autoUpdateDisalbedMods: bool = false
 var config : ModLoaderConfig = ModLoaderConfig.new()
 
 func loadConfig():
@@ -40,6 +41,8 @@ func loadConfig():
 		config.allowAutoUpdate = obj["allowAutoUpdate"]
 	if "allowModAutoUpdates" in obj:
 		config.allowModAutoUpdates = obj["allowModAutoUpdates"]
+	if "autoUpdateDisalbedMods" in obj:
+		config.autoUpdateDisalbedMods = obj["autoUpdateDisalbedMods"]
 	SettingsPage.onLoaded()
 
 func saveConfig():
@@ -48,7 +51,8 @@ func saveConfig():
 		"startOnConfigScreen": config.startOnConfigScreen,
 		"autoUpdatePreRelease": config.autoUpdatePreRelease,
 		"allowAutoUpdate": config.allowAutoUpdate,
-		"allowModAutoUpdates": config.allowModAutoUpdates
+		"allowModAutoUpdates": config.allowModAutoUpdates,
+		"autoUpdateDisalbedMods": config.autoUpdateDisalbedMods
 	}
 	var jstr = JSON.stringify(jarr)
 	var f = FileAccess.open(configPath, FileAccess.WRITE)

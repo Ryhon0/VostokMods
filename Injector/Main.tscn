@@ -1,9 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://b6nywv6aqxm3r"]
+[gd_scene load_steps=9 format=3 uid="uid://b6nywv6aqxm3r"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_x5slr"]
 [ext_resource type="Texture2D" uid="uid://wbaqykif8euy" path="res://icon.svg" id="2_74yqq"]
 [ext_resource type="Script" path="res://Settings.gd" id="2_b0jil"]
 [ext_resource type="Script" path="res://ModList.gd" id="3_xyy35"]
+[ext_resource type="Texture2D" uid="uid://bhyjjcpqm564o" path="res://pin.svg" id="4_rv4x7"]
+[ext_resource type="Texture2D" uid="uid://epy24urpfgha" path="res://pin_disabled.svg" id="5_33vpw"]
 [ext_resource type="Texture2D" uid="uid://bcc6fhil26kqe" path="res://donate_icon.png" id="5_r2nj5"]
 [ext_resource type="Script" path="res://AutoUpdater.gd" id="6_etu4i"]
 
@@ -48,7 +50,6 @@ layout_mode = 2
 max_value = 1.0
 
 [node name="ConfigScreen" type="HBoxContainer" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -61,15 +62,16 @@ layout_mode = 2
 size_flags_horizontal = 3
 current_tab = 0
 
-[node name="Settings" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "CustomModDirLine", "StartOnConfigCheckBox", "AllowAutoUpdateCheckBox", "AllowModsAutoUpdateCheckBox")]
+[node name="Settings" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "CustomModDirLine", "StartOnConfigCheckBox", "AllowAutoUpdateCheckBox", "AllowModAutoUpdatesCheckBox", "AutoUpdateDisabledModsCheckBox")]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("2_b0jil")
 Main = NodePath("../../..")
 CustomModDirLine = NodePath("VBoxContainer/GridContainer/HBoxContainer/CustomModDirLine")
-StartOnConfigCheckBox = NodePath("VBoxContainer/GridContainer/CheckBox")
-AllowAutoUpdateCheckBox = NodePath("VBoxContainer/GridContainer/CheckBox2")
-AllowModAutoUpdatesCheckBox = NodePath("VBoxContainer/GridContainer/CheckBox3")
+StartOnConfigCheckBox = NodePath("VBoxContainer/GridContainer/ConfigStartCheckBox")
+AllowAutoUpdateCheckBox = NodePath("VBoxContainer/GridContainer/LoaderUpdatesCheckBox")
+AllowModAutoUpdatesCheckBox = NodePath("VBoxContainer/GridContainer/ModUpdatesCheckBox")
+AutoUpdateDisabledModsCheckBox = NodePath("VBoxContainer/GridContainer/DisabledModUpdatesCheckBox")
 metadata/_tab_index = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/TabContainer/Settings"]
@@ -103,23 +105,31 @@ text = "..."
 layout_mode = 2
 text = "Start on config screen"
 
-[node name="CheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="ConfigStartCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 
 [node name="Label3" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
 layout_mode = 2
-text = "Enable VostokMods auto update"
+text = "Automatically update mod loader"
 
-[node name="CheckBox2" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="LoaderUpdatesCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 
 [node name="Label4" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
 layout_mode = 2
-text = "Enable auto update of Mods"
+text = "Automatically update mods"
 
-[node name="CheckBox3" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="ModUpdatesCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label5" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Automatically update disabled mods"
+
+[node name="DisabledModUpdatesCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 
@@ -129,13 +139,15 @@ layout_mode = 2
 script = ExtResource("3_xyy35")
 Main = NodePath("../../..")
 List = NodePath("ModListTree")
+PinIcon = ExtResource("4_rv4x7")
+PinIconDisabled = ExtResource("5_33vpw")
 metadata/_tab_index = 1
 
 [node name="ModListTree" type="Tree" parent="ConfigScreen/TabContainer/Mods"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-columns = 5
+columns = 6
 column_titles_visible = true
 hide_root = true
 select_mode = 1
@@ -229,6 +241,7 @@ Main = NodePath("..")
 
 [connection signal="tab_changed" from="ConfigScreen/TabContainer" to="ConfigScreen/TabContainer/Mods" method="tabChanged"]
 [connection signal="pressed" from="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer/Button" to="ConfigScreen/TabContainer/Settings" method="openModDirDialog"]
+[connection signal="button_clicked" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="buttonPressed"]
 [connection signal="column_title_clicked" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="titleClicked"]
 [connection signal="item_edited" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="itemEdited"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button2" to="." method="openDonatePage"]
