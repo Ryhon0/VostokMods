@@ -61,7 +61,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 current_tab = 0
 
-[node name="Settings" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "CustomModDirLine", "StartOnConfigCheckBox", "AllowAutoUpdateCheckBox")]
+[node name="Settings" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "CustomModDirLine", "StartOnConfigCheckBox", "AllowAutoUpdateCheckBox", "AllowModsAutoUpdateCheckBox")]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("2_b0jil")
@@ -69,6 +69,7 @@ Main = NodePath("../../..")
 CustomModDirLine = NodePath("VBoxContainer/GridContainer/HBoxContainer/CustomModDirLine")
 StartOnConfigCheckBox = NodePath("VBoxContainer/GridContainer/CheckBox")
 AllowAutoUpdateCheckBox = NodePath("VBoxContainer/GridContainer/CheckBox2")
+AllowModsAutoUpdateCheckBox = NodePath("VBoxContainer/GridContainer/CheckBox3")
 metadata/_tab_index = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/TabContainer/Settings"]
@@ -111,6 +112,14 @@ layout_mode = 2
 text = "Enable VostokMods auto update"
 
 [node name="CheckBox2" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label4" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Enable auto update of Mods"
+
+[node name="CheckBox3" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 
