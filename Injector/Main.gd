@@ -19,6 +19,7 @@ class ModLoaderConfig:
 	var customModDir : String = ""
 	var startOnConfigScreen : bool = false
 	var autoUpdatePreRelease : bool = false
+	var allowAutoUpdate: bool = true
 var config : ModLoaderConfig = ModLoaderConfig.new()
 
 func loadConfig():
@@ -34,14 +35,16 @@ func loadConfig():
 		config.startOnConfigScreen = obj["startOnConfigScreen"]
 	if "autoUpdatePreRelease" in obj:
 		config.autoUpdatePreRelease = obj["autoUpdatePreRelease"]
-
+	if "allowAutoUpdate" in obj:
+		config.allowAutoUpdate = obj["allowAutoUpdate"]
 	SettingsPage.onLoaded()
 
 func saveConfig():
 	var jarr = {
 		"customModDir": config.customModDir,
 		"startOnConfigScreen": config.startOnConfigScreen,
-		"autoUpdatePreRelease": config.autoUpdatePreRelease
+		"autoUpdatePreRelease": config.autoUpdatePreRelease,
+		"allowAutoUpdate": config.allowAutoUpdate
 	}
 	var jstr = JSON.stringify(jarr)
 	var f = FileAccess.open(configPath, FileAccess.WRITE)
@@ -102,7 +105,7 @@ func _ready() -> void:
 
 	Mods.loadMods()
 	showLoadingScreen()
-	if !OS.has_feature("editor"):
+	if !OS.has_feature("editor") and config.allowAutoUpdate:
 		await Updater.checkInjectorUpdate()
 	else: await Updater.checkModUpdates()
 
