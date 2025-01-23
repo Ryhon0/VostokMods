@@ -7,6 +7,8 @@ class_name ModList
 @export var PinIcon: Texture2D
 @export var PinIconDisabled: Texture2D
 
+@export var ModWorkshopLogo: Texture2D
+
 var mods : Array[ModInfo] = []
 
 class ModInfo:
@@ -57,13 +59,16 @@ class ModInfo:
 const VERSION_COLUMN = 2
 const VERSION_COLUMN_BUTTON_PIN = 0
 
-const ENABLED_COLUMN = 4
+const LINKS_CLOLUMN = 4
+
+const ENABLED_COLUMN = 5
 
 func _ready():
 	List.set_column_title(0, "Name")
 	List.set_column_title(1, "ID")
 	List.set_column_title(VERSION_COLUMN, "Version")
 	List.set_column_title(3, "File name")
+	List.set_column_title(LINKS_CLOLUMN, "Links")
 	List.set_column_title(ENABLED_COLUMN, "Enabled")
 
 	for i in range(List.columns):
@@ -73,6 +78,7 @@ func _ready():
 	List.set_column_custom_minimum_width(1, 175)
 	List.set_column_custom_minimum_width(VERSION_COLUMN, 75)
 	List.set_column_custom_minimum_width(3, 175)
+	List.set_column_custom_minimum_width(LINKS_CLOLUMN, 90)
 
 func loadMods():
 	mods = []
@@ -138,13 +144,23 @@ func loadMods():
 		# Pin version
 		li.add_button(VERSION_COLUMN, PinIcon if pinned else PinIconDisabled, VERSION_COLUMN_BUTTON_PIN, false, "Pin version")
 
+		# Links
+		var links : Array[String] = []
+		if modi.config.has_section_key("updates", "modworkshop"):
+			li.add_button(LINKS_CLOLUMN, ModWorkshopLogo, -1, false, "ModWorkshop")
+			links.append("https://modworkshop.net/mod/" + str(modi.config.get_value("updates", "modworkshop")))
+		li.set_meta("links", links)
+
 func buttonPressed(item: TreeItem, column: int, button: int, mousebtn: int) -> void:
-	if column == VERSION_COLUMN && button == VERSION_COLUMN_BUTTON_PIN:
-		if mousebtn == MOUSE_BUTTON_LEFT:
-			var mod : ModInfo = item.get_meta("mod")
-			mod.pinVersion(!mod.versionPinned)
-			item.set_button(VERSION_COLUMN, VERSION_COLUMN_BUTTON_PIN, PinIcon if mod.versionPinned else PinIconDisabled)
-			return
+	if column == VERSION_COLUMN && button == VERSION_COLUMN_BUTTON_PIN && mousebtn == MOUSE_BUTTON_LEFT:
+		var mod : ModInfo = item.get_meta("mod")
+		mod.pinVersion(!mod.versionPinned)
+		item.set_button(VERSION_COLUMN, VERSION_COLUMN_BUTTON_PIN, PinIcon if mod.versionPinned else PinIconDisabled)
+		return
+	if column == LINKS_CLOLUMN && mousebtn == MOUSE_BUTTON_LEFT:
+		var links : Array[String] = item.get_meta("links")
+		OS.shell_open(links[button])
+		return
 
 func itemEdited() -> void:
 	if List.get_edited_column() == 4:

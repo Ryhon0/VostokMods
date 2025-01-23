@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://b6nywv6aqxm3r"]
+[gd_scene load_steps=10 format=3 uid="uid://b6nywv6aqxm3r"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_x5slr"]
 [ext_resource type="Texture2D" uid="uid://wbaqykif8euy" path="res://icon.svg" id="2_74yqq"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://bhyjjcpqm564o" path="res://pin.svg" id="4_rv4x7"]
 [ext_resource type="Texture2D" uid="uid://epy24urpfgha" path="res://pin_disabled.svg" id="5_33vpw"]
 [ext_resource type="Texture2D" uid="uid://bcc6fhil26kqe" path="res://donate_icon.png" id="5_r2nj5"]
+[ext_resource type="Texture2D" uid="uid://d1c10pv53ai2x" path="res://mws_logo_white.svg" id="6_0guad"]
 [ext_resource type="Script" path="res://AutoUpdater.gd" id="6_etu4i"]
 
 [node name="Main" type="Control" node_paths=PackedStringArray("VersionLabel", "StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "SettingsPage", "Mods", "Updater")]
@@ -141,6 +142,7 @@ Main = NodePath("../../..")
 List = NodePath("ModListTree")
 PinIcon = ExtResource("4_rv4x7")
 PinIconDisabled = ExtResource("5_33vpw")
+ModWorkshopLogo = ExtResource("6_0guad")
 metadata/_tab_index = 1
 
 [node name="ModListTree" type="Tree" parent="ConfigScreen/TabContainer/Mods"]
