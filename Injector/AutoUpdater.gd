@@ -16,11 +16,7 @@ func checkInjectorUpdate():
 	var err = httpReq.request(Main.githubAPIBaseURL + "repos/Ryhon0/VostokMods/releases", ["accept: application/vnd.github+json"])
 	if err != OK:
 		push_error("Failed to create mod loader releases request ", err)
-		if Main.config.allowModsAutoUpdate: 
-			await checkModUpdates()
-		else:
-			Main.Mods.loadMods()
-			Main.launchOrShowConfig()
+		await checkModUpdates()
 		return
 
 	Main.StatusLabel.text = "Checking for updates"
@@ -31,19 +27,11 @@ func checkInjectorUpdate():
 func injectorReleasesRequestCompleted(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray):
 	if result != HTTPRequest.RESULT_SUCCESS:
 		push_error("Failed to get mod loader releases")
-		if Main.config.allowModsAutoUpdate: 
-			await checkModUpdates()
-		else:
-			Main.Mods.loadMods()
-			Main.launchOrShowConfig()
+		await checkModUpdates()
 		return
 	if response_code < 200 || response_code >= 300:
 		push_error("Failed to get mod loader releases (HTTP code " + str(response_code) + ")")
-		if Main.config.allowModsAutoUpdate: 
-			await checkModUpdates()
-		else:
-			Main.Mods.loadMods()
-			Main.launchOrShowConfig()
+		await checkModUpdates()
 		return
 	
 	var json = JSON.parse_string(body.get_string_from_utf8())
@@ -65,11 +53,7 @@ func injectorReleasesRequestCompleted(result: int, response_code: int, _headers:
 		if Main.version != tag:
 			downloadLoaderUpdate(tag, injectorAsset)
 		else: 
-			if Main.config.allowModsAutoUpdate: 
-				await checkModUpdates()
-			else:
-				Main.Mods.loadMods()
-				Main.launchOrShowConfig()
+			await checkModUpdates()
 		return
 
 func downloadLoaderUpdate(tag, asset):
@@ -78,10 +62,7 @@ func downloadLoaderUpdate(tag, asset):
 	var err = httpReq.request(asset["browser_download_url"])
 	if err != OK:
 		Main.StatusLabel.text = "Failed to download mod loader update.\nCode " + str(err)
-		if Main.config.allowModsAutoUpdate: 
-			get_tree().create_timer(2).timeout.connect(checkModUpdates)
-		else:
-			get_tree().create_timer(2).timeout.connect(func(): Main.Mods.loadMods(); Main.launchOrShowConfig())
+		get_tree().create_timer(2).timeout.connect(checkModUpdates)
 		return
 
 	Main.StatusLabel.text = "Downloading mod loader version " + tag
@@ -93,18 +74,12 @@ func injectorFileDownloaded(result: int, response_code: int, _headers: PackedStr
 	if result != HTTPRequest.RESULT_SUCCESS:
 		push_error("Failed to download mod loader")
 		Main.StatusLabel.text = "Failed to save mod loader, error " + str(FileAccess.get_open_error())
-		if Main.config.allowModsAutoUpdate: 
-			get_tree().create_timer(2).timeout.connect(checkModUpdates)
-		else:
-			get_tree().create_timer(2).timeout.connect(func(): Main.Mods.loadMods(); Main.launchOrShowConfig())
+		get_tree().create_timer(2).timeout.connect(checkModUpdates)
 		return
 	if response_code < 200 || response_code >= 300:
 		push_error("Failed to get mod loader releases (HTTP code " + str(response_code) + ")")
 		Main.StatusLabel.text = "Failed to save mod loader, error " + str(FileAccess.get_open_error())
-		if Main.config.allowModsAutoUpdate: 
-			get_tree().create_timer(2).timeout.connect(checkModUpdates)
-		else:
-			get_tree().create_timer(2).timeout.connect(func(): Main.Mods.loadMods(); Main.launchOrShowConfig())
+		get_tree().create_timer(2).timeout.connect(checkModUpdates)
 		return
 
 	var dir = ProjectSettings.globalize_path(".")
@@ -114,20 +89,14 @@ func injectorFileDownloaded(result: int, response_code: int, _headers: PackedStr
 	var err = DirAccess.rename_absolute(injectorPath, deletemePath)
 	if err != OK:
 		Main.StatusLabel.text = "Failed to move moad loader, error " + str(err)
-		if Main.config.allowModsAutoUpdate: 
-			get_tree().create_timer(2).timeout.connect(checkModUpdates)
-		else:
-			get_tree().create_timer(2).timeout.connect(func(): Main.Mods.loadMods(); Main.launchOrShowConfig())
+		get_tree().create_timer(2).timeout.connect(checkModUpdates)
 		return
 	
 	var f = FileAccess.open(injectorPath, FileAccess.WRITE)
 	if !f:
 		DirAccess.rename_absolute(deletemePath, injectorPath)
 		Main.StatusLabel.text = "Failed to save mod loader, error " + str(FileAccess.get_open_error())
-		if Main.config.allowModsAutoUpdate: 
-			get_tree().create_timer(2).timeout.connect(checkModUpdates)
-		else:
-			get_tree().create_timer(2).timeout.connect(func(): Main.Mods.loadMods(); Main.launchOrShowConfig())
+		get_tree().create_timer(2).timeout.connect(checkModUpdates)
 		return
 	f.store_buffer(body)
 	f.close()
@@ -138,6 +107,11 @@ func injectorFileDownloaded(result: int, response_code: int, _headers: PackedStr
 	get_tree().quit()
 
 func checkModUpdates():
+	if !Main.config.allowModAutoUpdates:
+		Main.Mods.loadMods()
+		Main.launchOrShowConfig()
+		return
+
 	Main.StatusLabel.text = "Checking for mod updates"
 	Main.Progress.value = 0
 	Main.Progress.max_value = 1
