@@ -45,9 +45,9 @@ func loadConfig():
 		config.autoUpdateDisalbedMods = obj["autoUpdateDisalbedMods"]
 	SettingsPage.onLoaded()
 
-# This patch will allows for externally made changes (e.g., by mods) 
+# This patch will allow for externally made changes (e.g., by mods) 
 # to stay persistent. Before this patch this function would always 
-# truncate the existing config file and then store its contents. Now 
+# truncate the existing config file and then store its content. Now 
 # it is loading the existing file, updates known keys and then 
 # storing all of its new content to file.
 
@@ -90,7 +90,7 @@ func saveConfig():
 				"Failed while parsing existing config file. "+ \
 				"Fix the error or delete the file to restore orginal config then try again:\n\n" + \
 				"[Line %d]:\n\n%s\n\n%s" % [config_obj.get_error_line(), config_obj.get_error_message(), configPath], 
-				"VostokMods - Config could not be save")
+				"VostokMods - Config could not be saved")
 			return
 
 		# update values
