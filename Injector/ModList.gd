@@ -163,7 +163,7 @@ func buttonPressed(item: TreeItem, column: int, button: int, mousebtn: int) -> v
 		return
 
 func itemEdited() -> void:
-	if List.get_edited_column() == 4:
+	if List.get_edited_column() == ENABLED_COLUMN:
 		var item: TreeItem = List.get_edited()
 		var modi: ModInfo = item.get_meta("mod")
 		modi.makeDisabled(!modi.disabled)
