@@ -45,6 +45,21 @@ func loadConfig():
 		config.autoUpdateDisalbedMods = obj["autoUpdateDisalbedMods"]
 	SettingsPage.onLoaded()
 
+# This patch will allows for externally made changes (e.g., by mods) 
+# to stay persistent. Before this patch this function would always 
+# truncate the existing config file and then store its contents. Now 
+# it is loading the existing file, updates known keys and then 
+# storing all of its new content to file.
+
+# Maybe this can be flashed out by offering some interface that would 
+# allow mods to read/store config data in their own section:
+# { "mods": [ {"mod_id": "allowSomething: true} ] }
+
+# It would be kinda better to have each mod create its own config file 
+# in a subfolder called 'config' next to the 'mods' directory (similar 
+# to Minecraft modpacks). By offering an interface this could help form 
+# a standard. - Fabian, 26 Jan 2025
+
 func saveConfig():
 	var jarr = {
 		"customModDir": config.customModDir,
@@ -54,9 +69,38 @@ func saveConfig():
 		"allowModAutoUpdates": config.allowModAutoUpdates,
 		"autoUpdateDisalbedMods": config.autoUpdateDisalbedMods
 	}
-	var jstr = JSON.stringify(jarr)
+
+	var config_indent = "    "
+	var config_sort_keys = false
+	var config_json : String = ""
+	
+	if not FileAccess.file_exists(configPath):
+		config_json = JSON.stringify(jarr, config_indent, config_sort_keys)
+
+	else:
+		# read original
+		var file_old = FileAccess.open(configPath, FileAccess.READ)
+		var config_obj = JSON.new()
+		
+		# parse
+		var err = config_obj.parse(file_old.get_as_text())
+		file_old.close()
+		if err != OK:
+			OS.alert(
+				"Failed while parsing existing config file. "+ \
+				"Fix the error or delete the file to restore orginal config then try again:\n\n" + \
+				"[Line %d]:\n\n%s\n\n%s" % [config_obj.get_error_line(), config_obj.get_error_message(), configPath], 
+				"VostokMods - Config could not be save")
+			return
+
+		# update values
+		for key in jarr:
+			config_obj.data[key] = jarr.get(key)
+
+		config_json = JSON.stringify(config_obj.data, config_indent, config_sort_keys)
+
 	var f = FileAccess.open(configPath, FileAccess.WRITE)
-	f.store_string(jstr)
+	f.store_string(config_json)
 	f.flush()
 	f.close()
 
