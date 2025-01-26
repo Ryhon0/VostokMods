@@ -167,7 +167,7 @@ func itemEdited() -> void:
 		var item: TreeItem = List.get_edited()
 		var modi: ModInfo = item.get_meta("mod")
 		modi.makeDisabled(!modi.disabled)
-		item.set_checked(ENABLED_COLUMN, modi.disabled)
+		item.set_checked(ENABLED_COLUMN, !modi.disabled)
 
 func titleClicked(col: int, mouse: int) -> void:
 	if mouse != MOUSE_BUTTON_LEFT:
