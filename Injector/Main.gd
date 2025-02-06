@@ -125,8 +125,6 @@ func launchOrShowConfig():
 		showLoadingScreen()
 		launch()
 
-	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED, 0)
-
 func getModsDir() -> String:
 	if config.customModDir:
 		return config.customModDir
