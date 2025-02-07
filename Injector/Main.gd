@@ -218,7 +218,31 @@ func startGame(modded: bool = true) -> void:
 		destFa.store_buffer(srcFa.get_buffer(srcFa.get_length()))
 		destFa.close()
 		srcFa.close()
-	
+
+	for mod in Mods.mods:
+		if mod.disabled: continue
+		if !mod.config.has_section_key("mod", "copyFiles"): continue
+		var copyFilesDir = mod.config.get_value("mod", "copyFiles")
+		if copyFilesDir is not String:
+			printerr("copyFiles for mod ", mod.zipPath, " is not a path to a directory!")
+			continue
+		if !copyFilesDir.ends_with("/"): copyFilesDir += "/"
+		var zip = ZIPReader.new()
+		zip.open(mod.zipPath + ".zip")
+		for f in zip.get_files():
+			if !f.begins_with(copyFilesDir): continue
+			var fname = f.trim_prefix(copyFilesDir)
+			if !fname || !fname.length(): continue
+			var outPath = runDir.path_join(fname).simplify_path()
+			if !outPath.begins_with(runDir):
+				printerr("File ", fname, " in mod ", mod.zipPath, " tried to escape the run dir!")
+				continue
+			print("Copying file ", fname, " from mod ", mod.zipPath)
+			var buf = zip.read_file(f)
+			var outf = FileAccess.open(outPath, FileAccess.ModeFlags.WRITE)
+			outf.store_buffer(buf)
+			outf.close()
+
 	# Dump the project.godot
 	var dumperPid = OS.create_process(runExec, ["--headless", "--quit", "-s", "ProjectDumper.gd", "--path", runDir, "--main-pack", runPck], false)
 	if dumperPid == -1:
@@ -240,14 +264,12 @@ func startGame(modded: bool = true) -> void:
 
 	# Create override.cfg
 	var override = ConfigFile.new()
-	
 	# Add the mod .zip paths to be loaded by MainLoop
 	var zips = []
 	for mod in Mods.mods:
 		if mod.disabled: continue
 		zips.append(mod.zipPath + ".zip")
 	override.set_value("vostokmods", "zips", zips)
-	
 	# Merge mod override.cfg
 	for mod in Mods.mods:
 		if mod.disabled: continue
