@@ -173,6 +173,7 @@ func injectAndLaunch(modded: bool = true) -> void:
 	showLoadingScreen()
 	startGame(modded)
 
+const forbiddenOverrideSections = ["autoload", "vostokmods"]
 const REPLACEME_NULL = "%VM_REPLACEME_NULL%"
 const REPLACEME_EMPTY = "%VM_REPLACEME_EMPTY%"
 func startGame(modded: bool = true) -> void:
@@ -246,7 +247,27 @@ func startGame(modded: bool = true) -> void:
 		if mod.disabled: continue
 		zips.append(mod.zipPath + ".zip")
 	override.set_value("vostokmods", "zips", zips)
-		
+	
+	# Merge mod override.cfg
+	for mod in Mods.mods:
+		if mod.disabled: continue
+		var zip = ZIPReader.new()
+		zip.open(mod.zipPath + ".zip")
+		if !zip.file_exists("override.cfg"):
+			zip.close()
+			continue
+		var modCfg = ConfigFile.new()
+		err = modCfg.parse(zip.read_file("override.cfg").get_string_from_utf8())
+		if err != OK:
+			printerr("Failed to read mod override config for mod ", mod.zipPath)
+			zip.close()
+			continue
+		for sect in modCfg.get_sections():
+			if sect in forbiddenOverrideSections:
+				printerr("Mod ", mod.zipPath, " tried to override forbidden section ", sect, ", ignoring")
+				continue
+			for k in modCfg.get_section_keys(sect):
+				override.set_value(sect, k, modCfg.get_value(sect, k))
 
 	# Create autoloads
 	# Remove built-in autoloads. Adding them later changes their order
