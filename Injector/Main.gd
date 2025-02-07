@@ -7,6 +7,7 @@ class_name InjectorMain
 
 @export var LoadingScreen: Control
 @export var ConfigScreen: Control
+@export var WindowsDeveloperScreen: Control
 
 @export var SettingsPage: Control
 @export var Mods: ModList
@@ -28,7 +29,7 @@ var config: ModLoaderConfig = ModLoaderConfig.new()
 func loadConfig():
 	if !FileAccess.file_exists(configPath):
 		return
-	
+
 	var f = FileAccess.open(configPath, FileAccess.READ)
 	var obj = JSON.parse_string(f.get_as_text())
 	config = ModLoaderConfig.new()
@@ -90,12 +91,28 @@ func getGameDir() -> String:
 	return OS.get_executable_path().get_base_dir() + "/"
 
 func showLoadingScreen():
-	LoadingScreen.show()
+	WindowsDeveloperScreen.hide()
 	ConfigScreen.hide()
+	
+	LoadingScreen.show()
+
+func showWindowsDeveloperScreen():
+	ConfigScreen.hide()
+	LoadingScreen.hide()
+
+	WindowsDeveloperScreen.show()
 
 func showConfigScreen():
-	ConfigScreen.show()
+	WindowsDeveloperScreen.hide()
 	LoadingScreen.hide()
+
+	ConfigScreen.show()
+
+func retrySymlinkCheck() -> void:
+	if !canCreateSymlinks():
+		showWindowsDeveloperScreen()
+	else:
+		launchOrShowConfig()
 
 func _ready() -> void:
 	loadConfig()
@@ -116,6 +133,15 @@ func _ready() -> void:
 		await Updater.checkModUpdates()
 
 func launchOrShowConfig():
+	if !canCreateSymlinks():
+		if windowsIsDeveloper():
+			OS.alert("Cannot create symlinks but developer mode is enabled! This should not happen!")
+			get_tree().quit()
+			return
+		else:
+			showWindowsDeveloperScreen()
+			return
+
 	if config.startOnConfigScreen:
 		showConfigScreen()
 	else:
@@ -156,7 +182,7 @@ func _input(event: InputEvent) -> void:
 		return
 	if event.is_pressed():
 		cancelLaunch()
-		
+
 func cancelLaunch() -> void:
 	launchTimer.stop()
 	launchTimer.queue_free()
@@ -194,7 +220,7 @@ func startGame(modded: bool = true) -> void:
 	var runDir = getTempDir()
 	print("Run dir: " + runDir)
 	var da = DirAccess.open(runDir)
-	
+
 	# Link the executable to the run dir
 	var runExec = runDir.path_join(OS.get_executable_path().get_file())
 	var err = da.create_link(OS.get_executable_path(), runExec)
@@ -202,7 +228,7 @@ func startGame(modded: bool = true) -> void:
 		StatusLabel.text = "Failed to create executable symlink, error code " + str(err)
 		shutdown()
 		return
-	
+
 	# Link the game PCK to the run dir
 	var runPck = runDir.path_join(pckName)
 	err = da.create_link(pckPath, runPck)
@@ -210,7 +236,7 @@ func startGame(modded: bool = true) -> void:
 		StatusLabel.text = "Failed to create PCK symlink, error code " + str(err)
 		shutdown()
 		return
-	
+
 	# Copy main loop script and assets to run dir
 	for f in ["ProjectDumper.gd", "MainLoop.gd", "ModLoader.gd"]:
 		var srcFa = FileAccess.open("res://ModLoader/" + f, FileAccess.ModeFlags.READ)
@@ -250,10 +276,10 @@ func startGame(modded: bool = true) -> void:
 		StatusLabel.text = "Failed to dump project"
 		shutdown()
 		return
-	
+
 	while OS.is_process_running(dumperPid):
 		await RenderingServer.frame_post_draw
-	
+
 	var projectPath = runDir.path_join("project.godot")
 	if !FileAccess.file_exists(projectPath):
 		StatusLabel.text = "Project dumper failed to dump"
@@ -360,3 +386,27 @@ func getTempDir() -> String:
 
 func openDonatePage():
 	OS.shell_open("https://github.com/sponsors/Ryhon0")
+
+func windowsGetRegistry(reg: String, key: String) -> String:
+	var out = []
+	OS.execute("reg.exe", ["query", reg, "/v", key, "/t", "REG_DWORD"], out)
+	if out.size() == 0: return ""
+	var lines = out[0].split("\r\n")
+	if lines[1] != reg: return ""
+	var split = lines[2].split(" ")
+	return split[split.size()-1]
+
+func windowsIsDeveloper() -> bool:
+	if OS.get_name() != "Windows": return true
+	return windowsGetRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock","AllowDevelopmentWithoutDevLicense") == "0x1"
+
+func windowsOpenDeveloperSettings() -> void:
+	OS.shell_open("ms-settings:developers")
+
+func canCreateSymlinks() -> bool:
+	var tmpDir = getTempDir()
+	var tmpFile1 = tmpDir.path_join(str(randi()) + ".tmp0") 
+	var tmpFile2 = tmpFile1 + ".symlink"
+	FileAccess.open(tmpFile1, FileAccess.ModeFlags.WRITE).close()
+	var err = DirAccess.open(tmpDir).create_link(tmpFile1, tmpFile2)
+	return err == OK

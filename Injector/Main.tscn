@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://d1c10pv53ai2x" path="res://mws_logo_white.svg" id="6_0guad"]
 [ext_resource type="Script" path="res://AutoUpdater.gd" id="6_etu4i"]
 
-[node name="Main" type="Control" node_paths=PackedStringArray("VersionLabel", "StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "SettingsPage", "Mods", "Updater")]
+[node name="Main" type="Control" node_paths=PackedStringArray("VersionLabel", "StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "WindowsDeveloperScreen", "SettingsPage", "Mods", "Updater")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,6 +23,7 @@ StatusLabel = NodePath("LoadingScreen/VBoxContainer/StatusLabel")
 Progress = NodePath("LoadingScreen/VBoxContainer/Progress")
 LoadingScreen = NodePath("LoadingScreen")
 ConfigScreen = NodePath("ConfigScreen")
+WindowsDeveloperScreen = NodePath("WindowsDeveloperScreen")
 SettingsPage = NodePath("ConfigScreen/TabContainer/Settings")
 Mods = NodePath("ConfigScreen/TabContainer/Mods")
 Updater = NodePath("AutoUpdater")
@@ -50,6 +51,52 @@ custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 max_value = 1.0
 
+[node name="WindowsDeveloperScreen" type="CenterContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="WindowsDeveloperScreen"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Label" type="Label" parent="WindowsDeveloperScreen/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Windows developer mode is not enabled!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="WindowsDeveloperScreen/VBoxContainer"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Developer mode is required to create Symlinks without admin privileges.
+
+They are required by the mod loader to create a temporary enviroment for the game to run in.
+Symlinks are files that point to another path, acting as a regular file. This lets the mod loader \"copy\" the game files to the enviroment without taking up more space.
+
+Please enable developer mode by clicking the button below to open the developer settings and check the \"Developer Mode\" box, then press the \"Retry\" button below"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="WindowsDeveloperScreen/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Button" type="Button" parent="WindowsDeveloperScreen/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Open Developer Settings"
+
+[node name="Button2" type="Button" parent="WindowsDeveloperScreen/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Retry"
+
 [node name="ConfigScreen" type="HBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -61,9 +108,30 @@ grow_vertical = 2
 [node name="TabContainer" type="TabContainer" parent="ConfigScreen"]
 layout_mode = 2
 size_flags_horizontal = 3
-current_tab = 0
+current_tab = 1
 
-[node name="Settings" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "CustomModDirLine", "StartOnConfigCheckBox", "AllowAutoUpdateCheckBox", "AllowModAutoUpdatesCheckBox", "AutoUpdateDisabledModsCheckBox")]
+[node name="Mods" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "List")]
+visible = false
+layout_mode = 2
+script = ExtResource("3_xyy35")
+Main = NodePath("../../..")
+List = NodePath("ModListTree")
+PinIcon = ExtResource("4_rv4x7")
+PinIconDisabled = ExtResource("5_33vpw")
+ModWorkshopLogo = ExtResource("6_0guad")
+metadata/_tab_index = 0
+
+[node name="ModListTree" type="Tree" parent="ConfigScreen/TabContainer/Mods"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 6
+column_titles_visible = true
+hide_root = true
+select_mode = 1
+scroll_horizontal_enabled = false
+
+[node name="Settings" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "CustomModDirLine", "StartOnConfigCheckBox", "AllowAutoUpdateCheckBox", "AllowModAutoUpdatesCheckBox", "AutoUpdateDisabledModsCheckBox", "PreReleaseLoaderCheckBox")]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("2_b0jil")
@@ -133,27 +201,6 @@ text = "Automatically update disabled mods"
 [node name="DisabledModUpdatesCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
-
-[node name="Mods" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "List")]
-visible = false
-layout_mode = 2
-script = ExtResource("3_xyy35")
-Main = NodePath("../../..")
-List = NodePath("ModListTree")
-PinIcon = ExtResource("4_rv4x7")
-PinIconDisabled = ExtResource("5_33vpw")
-ModWorkshopLogo = ExtResource("6_0guad")
-metadata/_tab_index = 1
-
-[node name="ModListTree" type="Tree" parent="ConfigScreen/TabContainer/Mods"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-columns = 6
-column_titles_visible = true
-hide_root = true
-select_mode = 1
-scroll_horizontal_enabled = false
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="ConfigScreen"]
 custom_minimum_size = Vector2(300, 0)
@@ -241,11 +288,13 @@ text = "Launch"
 script = ExtResource("6_etu4i")
 Main = NodePath("..")
 
+[connection signal="pressed" from="WindowsDeveloperScreen/VBoxContainer/HBoxContainer/Button" to="." method="windowsOpenDeveloperSettings"]
+[connection signal="pressed" from="WindowsDeveloperScreen/VBoxContainer/HBoxContainer/Button2" to="." method="retrySymlinkCheck"]
 [connection signal="tab_changed" from="ConfigScreen/TabContainer" to="ConfigScreen/TabContainer/Mods" method="tabChanged"]
-[connection signal="pressed" from="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer/Button" to="ConfigScreen/TabContainer/Settings" method="openModDirDialog"]
 [connection signal="button_clicked" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="buttonPressed"]
 [connection signal="column_title_clicked" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="titleClicked"]
 [connection signal="item_edited" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="itemEdited"]
+[connection signal="pressed" from="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer/Button" to="ConfigScreen/TabContainer/Settings" method="openModDirDialog"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button2" to="." method="openDonatePage"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/Button" to="." method="openMods"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/Button2" to="." method="openUser"]
