@@ -238,6 +238,7 @@ func startGame(modded: bool = true) -> void:
 				printerr("File ", fname, " in mod ", mod.zipPath, " tried to escape the run dir!")
 				continue
 			print("Copying file ", fname, " from mod ", mod.zipPath)
+			DirAccess.make_dir_recursive_absolute(outPath.get_base_dir())
 			var buf = zip.read_file(f)
 			var outf = FileAccess.open(outPath, FileAccess.ModeFlags.WRITE)
 			outf.store_buffer(buf)
