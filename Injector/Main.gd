@@ -361,7 +361,6 @@ func startGame(modded: bool = true) -> void:
 		shutdown()
 		return
 	print("Game started with pid " + str(pid))
-	OS.shell_open(runDir)
 	get_tree().quit()
 
 func getTempDir() -> String:
