@@ -6,6 +6,7 @@ extends Control
 @export var AllowAutoUpdateCheckBox: CheckBox
 @export var AllowModAutoUpdatesCheckBox: CheckBox
 @export var AutoUpdateDisabledModsCheckBox: CheckBox
+@export var PreReleaseLoaderCheckBox: CheckBox
 
 func _ready() -> void:
 	CustomModDirLine.text_changed.connect(func(val): Main.config.customModDir = val; Main.saveConfig(); Main.Mods.loadMods())
@@ -13,6 +14,7 @@ func _ready() -> void:
 	AllowAutoUpdateCheckBox.toggled.connect(func(val): Main.config.allowAutoUpdate = val; Main.saveConfig())
 	AllowModAutoUpdatesCheckBox.toggled.connect(func(val): Main.config.allowModAutoUpdates = val; Main.saveConfig())
 	AutoUpdateDisabledModsCheckBox.toggled.connect(func(val): Main.config.autoUpdateDisalbedMods = val; Main.saveConfig())
+	PreReleaseLoaderCheckBox.toggled.connect(func(val): Main.config.autoUpdatePreRelease = val; Main.saveConfig())
 
 func openModDirDialog():
 	var fd = FileDialog.new()
@@ -29,3 +31,4 @@ func onLoaded():
 	AllowAutoUpdateCheckBox.button_pressed = Main.config.allowAutoUpdate
 	AllowModAutoUpdatesCheckBox.button_pressed = Main.config.allowModAutoUpdates
 	AutoUpdateDisabledModsCheckBox.button_pressed = Main.config.autoUpdateDisalbedMods
+	PreReleaseLoaderCheckBox.button_pressed = Main.config.autoUpdatePreRelease

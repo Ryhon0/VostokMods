@@ -141,7 +141,8 @@ StartOnConfigCheckBox = NodePath("VBoxContainer/GridContainer/ConfigStartCheckBo
 AllowAutoUpdateCheckBox = NodePath("VBoxContainer/GridContainer/LoaderUpdatesCheckBox")
 AllowModAutoUpdatesCheckBox = NodePath("VBoxContainer/GridContainer/ModUpdatesCheckBox")
 AutoUpdateDisabledModsCheckBox = NodePath("VBoxContainer/GridContainer/DisabledModUpdatesCheckBox")
-metadata/_tab_index = 0
+PreReleaseLoaderCheckBox = NodePath("VBoxContainer/GridContainer/PreReleaseLoaderCheckBox")
+metadata/_tab_index = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/TabContainer/Settings"]
 layout_mode = 2
@@ -183,6 +184,14 @@ layout_mode = 2
 text = "Automatically update mod loader"
 
 [node name="LoaderUpdatesCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Label6" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Download testing versions of the loader"
+
+[node name="PreReleaseLoaderCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 
