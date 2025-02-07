@@ -29,7 +29,6 @@ Mods = NodePath("ConfigScreen/TabContainer/Mods")
 Updater = NodePath("AutoUpdater")
 
 [node name="LoadingScreen" type="CenterContainer" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -98,6 +97,7 @@ layout_mode = 2
 text = "Retry"
 
 [node name="ConfigScreen" type="HBoxContainer" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -108,10 +108,9 @@ grow_vertical = 2
 [node name="TabContainer" type="TabContainer" parent="ConfigScreen"]
 layout_mode = 2
 size_flags_horizontal = 3
-current_tab = 1
+current_tab = 0
 
 [node name="Mods" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "List")]
-visible = false
 layout_mode = 2
 script = ExtResource("3_xyy35")
 Main = NodePath("../../..")
@@ -132,6 +131,7 @@ select_mode = 1
 scroll_horizontal_enabled = false
 
 [node name="Settings" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "CustomModDirLine", "StartOnConfigCheckBox", "AllowAutoUpdateCheckBox", "AllowModAutoUpdatesCheckBox", "AutoUpdateDisabledModsCheckBox", "PreReleaseLoaderCheckBox")]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("2_b0jil")
