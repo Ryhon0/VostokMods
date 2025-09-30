@@ -12,38 +12,43 @@ class_name ModList
 var mods : Array[ModInfo] = []
 
 class ModInfo:
-	var zipPath : String
-	var config : ConfigFile
+	# Name of the mod file without the X- priority prefix and .zip/.zip.disabled extension
+	var name : String
+
+	var priority : int
 	var disabled : bool
 	var versionPinned : bool
 
-	func makeDisabled(disable: bool):
-		var from = zipPath + ".zip"
-		var to = zipPath + ".zip"
+	var config : ConfigFile
 
-		if disable: to += ".disabled"
-		else: from += ".disabled"
+	func makeDisabled(disable: bool):
+		if disabled == disable: return
+		var from = getPath()
+		var oldState = disabled
+		disabled = disable
+		var to = getPath()
 
 		var err = DirAccess.rename_absolute(from, to)
 		if err != OK:
 			OS.alert("Could not move file " + from + " to " + to + ". Error " + err)
+			disabled = oldState
 			return
-		
-		disabled = disable
 	
 	func pinVersion(pin: bool):
+		var main = Engine.get_main_loop().root.get_node("Main")
+		var dontUpdateFile = main.getModsDir().path_join(name + ".dontupdate")
 		if !pin:
-			var err = DirAccess.remove_absolute(zipPath + ".dontupdate")
+			var err = DirAccess.remove_absolute(dontUpdateFile)
 			if err != OK:
-				OS.alert("Could remove file " + zipPath + ".dontupdate. Error " + err)
+				OS.alert("Could remove file " + dontUpdateFile + "\nError " + err)
 				return
 			versionPinned = pin
 		else:
-			var f = FileAccess.open(zipPath + ".dontupdate", FileAccess.ModeFlags.WRITE)
+			var f = FileAccess.open(dontUpdateFile, FileAccess.ModeFlags.WRITE)
 			var err = FileAccess.get_open_error()
 
 			if err != OK:
-				OS.alert("Failed to create file " + zipPath + ".dontupdate. Error " + err)
+				OS.alert("Failed to create file " + dontUpdateFile + "\nError " + err)
 				return
 
 			f.store_string("")
@@ -51,36 +56,69 @@ class ModInfo:
 
 			err = f.get_error()
 			if err != OK:
-				OS.alert("Failed to save file " + zipPath + ".dontupdate. Error " + err)
+				OS.alert("Failed to save file " + dontUpdateFile + "\nError " + err)
 				return
 
 			versionPinned = pin
 
+	func setPriority(newPriority: int):
+		if priority == newPriority: return
+		var from = getPath()
+		var oldState = disabled
+		priority = newPriority
+		var to = getPath()
+
+		var err = DirAccess.rename_absolute(from, to)
+		if err != OK:
+			OS.alert("Could not move file " + from + " to " + to + ". Error " + err)
+			priority = oldState
+			return
+
+	func getPath() -> String:
+		var main = Engine.get_main_loop().root.get_node("Main")
+		var modsDir = main.getModsDir()
+
+		var path = ""
+		if priority != 0:
+			path += str(priority) + "-"
+		
+		path += name + ".zip"
+		if disabled:
+			path += ".disabled"
+		return modsDir.path_join(path)
+
+const NAME_COLUMN = 0
+const ID_COLUMN = 1
 const VERSION_COLUMN = 2
+const FILE_COLUMN = 3
 const VERSION_COLUMN_BUTTON_PIN = 0
 
 const LINKS_CLOLUMN = 4
 
-const ENABLED_COLUMN = 5
+const PRIORITY_COLUMN = 5
+const ENABLED_COLUMN = 6
 
 func _ready():
-	List.set_column_title(0, "Name")
-	List.set_column_title(1, "ID")
+	List.set_column_title(NAME_COLUMN, "Name")
+	List.set_column_title(ID_COLUMN, "ID")
 	List.set_column_title(VERSION_COLUMN, "Version")
 	List.set_column_title(3, "File name")
 	List.set_column_title(LINKS_CLOLUMN, "Links")
+	List.set_column_title(PRIORITY_COLUMN, "Priority")
 	List.set_column_title(ENABLED_COLUMN, "Enabled")
 
 	for i in range(List.columns):
 		List.set_column_expand(i, false)
 
-	List.set_column_expand(0, true)
-	List.set_column_custom_minimum_width(1, 175)
+	List.set_column_expand(NAME_COLUMN, true)
+	List.set_column_custom_minimum_width(ID_COLUMN, 175)
 	List.set_column_custom_minimum_width(VERSION_COLUMN, 75)
-	List.set_column_custom_minimum_width(3, 175)
+	List.set_column_custom_minimum_width(FILE_COLUMN, 175)
 	List.set_column_custom_minimum_width(LINKS_CLOLUMN, 90)
 
 func loadMods():
+	var priorityNameRegex = RegEx.new()
+	priorityNameRegex.compile("^\\-?\\d+-")
 	mods = []
 	var modsdir = Main.getModsDir()
 
@@ -101,6 +139,13 @@ func loadMods():
 			disabled = false
 		else:
 			continue
+		
+		var priorityResult = priorityNameRegex.search(zipname)
+		var priority = 0
+		if priorityResult != null:
+			priority = int(zipname.substr(0,priorityResult.get_end()))
+			zipname = zipname.substr(priorityResult.get_end())
+			
 		var pinned = FileAccess.file_exists(modsdir.path_join(zipname) + ".dontupdate")
 		
 		var zr = ZIPReader.new()
@@ -122,20 +167,35 @@ func loadMods():
 		var modver = cfg.get_value("mod", "version")
 
 		var modi = ModInfo.new()
-		modi.config = cfg
-		modi.zipPath = modsdir.path_join(zipname)
+		modi.name = zipname
+		modi.priority = priority
 		modi.disabled = disabled
 		modi.versionPinned = pinned
+		modi.config = cfg
+
+		# Fix the priority prefix if needed
+		# 01 -> 1
+		if modi.getPath() != modsdir.path_join(f):
+			print("Fixing priority prefix " + modsdir.path_join(f) + " -> " + modi.getPath())
+			var err = DirAccess.rename_absolute(modsdir.path_join(f), modi.getPath())
+			if err != OK:
+				OS.alert("Failed to fix the priority prefix of " + f + "\nError " + str(err))
+
 		mods.append(modi)
 
 		var li = List.create_item()
 		li.set_meta("mod", modi)
 
-		li.set_text(0, modname)
-		li.set_text(1, modid)
+		li.set_text(NAME_COLUMN, modname)
+		li.set_text(ID_COLUMN, modid)
 		li.set_text(VERSION_COLUMN, modver)
-		li.set_text(3, zipname)
-		
+		li.set_text(FILE_COLUMN, zipname)
+
+		# Priority
+		li.set_text_alignment(PRIORITY_COLUMN, HORIZONTAL_ALIGNMENT_RIGHT)
+		li.set_text(PRIORITY_COLUMN, str(priority))
+		li.set_editable(PRIORITY_COLUMN, true)
+
 		# Mod disalbed
 		li.set_cell_mode(ENABLED_COLUMN, TreeItem.CELL_MODE_CHECK)
 		li.set_checked(ENABLED_COLUMN, !disabled)
@@ -163,11 +223,18 @@ func buttonPressed(item: TreeItem, column: int, button: int, mousebtn: int) -> v
 		return
 
 func itemEdited() -> void:
+	var item: TreeItem = List.get_edited()
+	var modi: ModInfo = item.get_meta("mod")
 	if List.get_edited_column() == ENABLED_COLUMN:
-		var item: TreeItem = List.get_edited()
-		var modi: ModInfo = item.get_meta("mod")
 		modi.makeDisabled(!modi.disabled)
 		item.set_checked(ENABLED_COLUMN, !modi.disabled)
+	elif List.get_edited_column() == PRIORITY_COLUMN:
+		var text = item.get_text(PRIORITY_COLUMN)
+		if !text.is_valid_int():
+			item.set_text(PRIORITY_COLUMN, str(modi.priority))
+			return
+		modi.setPriority(int(text))
+		item.set_text(PRIORITY_COLUMN, str(modi.priority))
 
 func titleClicked(col: int, mouse: int) -> void:
 	if mouse != MOUSE_BUTTON_LEFT:
@@ -179,6 +246,9 @@ func titleClicked(col: int, mouse: int) -> void:
 		root.remove_child(i)
 	
 	items.sort_custom(func(a: TreeItem, b: TreeItem) -> bool:
+		if col == PRIORITY_COLUMN:
+			return int(a.get_text(PRIORITY_COLUMN)) > int(b.get_text(PRIORITY_COLUMN))
+
 		if a.get_cell_mode(col) == TreeItem.CELL_MODE_STRING:
 			return a.get_text(col).naturalnocasecmp_to(b.get_text(col)) < 0
 		

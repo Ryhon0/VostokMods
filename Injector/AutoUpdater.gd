@@ -167,11 +167,7 @@ func checkModUpdates():
 			push_warning("MWS mod ", k, " has an empty version!")
 			continue
 
-		var zip = mod.zipPath
-		if FileAccess.file_exists(zip + ".zip"):
-			zip += ".zip"
-		elif FileAccess.file_exists(zip + ".zip.disabled"):
-			zip += ".zip.disabled"
+		var zip = mod.getPath()
 
 		if version == latestVersion: # Already up to date 
 			print("MWS mod ", k , " is up to date")

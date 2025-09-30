@@ -25,7 +25,7 @@ LoadingScreen = NodePath("LoadingScreen")
 ConfigScreen = NodePath("ConfigScreen")
 WindowsDeveloperScreen = NodePath("WindowsDeveloperScreen")
 SettingsPage = NodePath("ConfigScreen/TabContainer/Settings")
-Mods = NodePath("ConfigScreen/TabContainer/Mods")
+Mods = NodePath("ConfigScreen/TabContainer/Mods/ModList")
 Updater = NodePath("AutoUpdater")
 
 [node name="LoadingScreen" type="CenterContainer" parent="."]
@@ -100,7 +100,6 @@ layout_mode = 2
 text = "Retry"
 
 [node name="ConfigScreen" type="HBoxContainer" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -113,25 +112,33 @@ layout_mode = 2
 size_flags_horizontal = 3
 current_tab = 0
 
-[node name="Mods" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "List")]
+[node name="Mods" type="VBoxContainer" parent="ConfigScreen/TabContainer"]
 layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="ModList" type="ScrollContainer" parent="ConfigScreen/TabContainer/Mods" node_paths=PackedStringArray("Main", "List")]
+layout_mode = 2
+size_flags_vertical = 3
 script = ExtResource("3_xyy35")
-Main = NodePath("../../..")
+Main = NodePath("../../../..")
 List = NodePath("ModListTree")
 PinIcon = ExtResource("4_rv4x7")
 PinIconDisabled = ExtResource("5_33vpw")
 ModWorkshopLogo = ExtResource("6_0guad")
-metadata/_tab_index = 0
 
-[node name="ModListTree" type="Tree" parent="ConfigScreen/TabContainer/Mods"]
+[node name="ModListTree" type="Tree" parent="ConfigScreen/TabContainer/Mods/ModList"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-columns = 6
+columns = 7
 column_titles_visible = true
 hide_root = true
 select_mode = 1
 scroll_horizontal_enabled = false
+
+[node name="ReloadModsButton" type="Button" parent="ConfigScreen/TabContainer/Mods"]
+layout_mode = 2
+text = "Reload Mod List"
 
 [node name="Settings" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "CustomModDirLine", "StartOnConfigCheckBox", "AllowAutoUpdateCheckBox", "AllowModAutoUpdatesCheckBox", "AutoUpdateDisabledModsCheckBox", "PreReleaseLoaderCheckBox")]
 visible = false
@@ -302,10 +309,11 @@ Main = NodePath("..")
 
 [connection signal="pressed" from="WindowsDeveloperScreen/VBoxContainer/HBoxContainer/Button" to="." method="windowsOpenDeveloperSettings"]
 [connection signal="pressed" from="WindowsDeveloperScreen/VBoxContainer/HBoxContainer/Button2" to="." method="retrySymlinkCheck"]
-[connection signal="tab_changed" from="ConfigScreen/TabContainer" to="ConfigScreen/TabContainer/Mods" method="tabChanged"]
-[connection signal="button_clicked" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="buttonPressed"]
-[connection signal="column_title_clicked" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="titleClicked"]
-[connection signal="item_edited" from="ConfigScreen/TabContainer/Mods/ModListTree" to="ConfigScreen/TabContainer/Mods" method="itemEdited"]
+[connection signal="tab_changed" from="ConfigScreen/TabContainer" to="ConfigScreen/TabContainer/Mods/ModList" method="tabChanged"]
+[connection signal="button_clicked" from="ConfigScreen/TabContainer/Mods/ModList/ModListTree" to="ConfigScreen/TabContainer/Mods/ModList" method="buttonPressed"]
+[connection signal="column_title_clicked" from="ConfigScreen/TabContainer/Mods/ModList/ModListTree" to="ConfigScreen/TabContainer/Mods/ModList" method="titleClicked"]
+[connection signal="item_edited" from="ConfigScreen/TabContainer/Mods/ModList/ModListTree" to="ConfigScreen/TabContainer/Mods/ModList" method="itemEdited"]
+[connection signal="pressed" from="ConfigScreen/TabContainer/Mods/ReloadModsButton" to="ConfigScreen/TabContainer/Mods/ModList" method="loadMods"]
 [connection signal="pressed" from="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer/Button" to="ConfigScreen/TabContainer/Settings" method="openModDirDialog"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button2" to="." method="openDonatePage"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/Button" to="." method="openMods"]

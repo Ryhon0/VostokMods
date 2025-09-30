@@ -211,9 +211,9 @@ func startGame(modded: bool = true) -> void:
 		return
 
 	if !modded:
-		var args = ["--main-pack", pckPath, "--"]
-		args.append_array(OS.get_cmdline_user_args())
-		OS.create_process(OS.get_executable_path(), args, false)
+		var pureArgs = ["--main-pack", pckPath, "--"]
+		pureArgs.append_array(OS.get_cmdline_user_args())
+		OS.create_process(OS.get_executable_path(), pureArgs, false)
 		get_tree().quit()
 		return
 
@@ -244,16 +244,31 @@ func startGame(modded: bool = true) -> void:
 		destFa.close()
 		srcFa.close()
 
-	for mod in Mods.mods:
+	# Dump the project.godot
+	var dumperPid = OS.create_process(runExec, ["--headless", "--quit", "-s", "ProjectDumper.gd", "--path", runDir, "--main-pack", runPck], false)
+	if dumperPid == -1:
+		shutdown("Failed to dump project")
+		return
+
+	while OS.is_process_running(dumperPid):
+		await RenderingServer.frame_post_draw
+
+	var orderedMods = Mods.mods.duplicate()
+	orderedMods.sort_custom(func (a, b) -> bool: return a.priority > b.priority)
+	var reverseMods = orderedMods.duplicate()
+	reverseMods.reverse()
+
+	# Copy mod files
+	for mod in reverseMods:
 		if mod.disabled: continue
 		if !mod.config.has_section_key("mod", "copyFiles"): continue
 		var copyFilesDir = mod.config.get_value("mod", "copyFiles")
 		if copyFilesDir is not String:
-			printerr("copyFiles for mod ", mod.zipPath, " is not a path to a directory!")
+			printerr("copyFiles for mod ", mod.name, " is not a path to a directory!")
 			continue
 		if !copyFilesDir.ends_with("/"): copyFilesDir += "/"
 		var zip = ZIPReader.new()
-		zip.open(mod.zipPath + ".zip")
+		zip.open(mod.getPath())
 		for f in zip.get_files():
 			# Ignore folders
 			if f[f.length()-1] == '/': continue
@@ -263,27 +278,18 @@ func startGame(modded: bool = true) -> void:
 			if !fname || !fname.length(): continue
 			var outPath = runDir.path_join(fname).simplify_path()
 			if !outPath.begins_with(runDir):
-				printerr("File ", fname, " in mod ", mod.zipPath, " tried to escape the run dir!")
+				printerr("File ", fname, " in mod ", mod.name, " tried to escape the run dir!")
 				continue
-			print("Copying file ", fname, " from mod ", mod.zipPath)
+			print("Copying file ", fname, " from mod ", mod.name)
 			DirAccess.make_dir_recursive_absolute(outPath.get_base_dir())
 			var buf = zip.read_file(f)
 			var outf = FileAccess.open(outPath, FileAccess.ModeFlags.WRITE)
 			if outf == null:
 				OS.shell_open(runDir)
-				shutdown("Failed to copy\n" + fname + "\nto\n" + outPath + "\nfrom mod " + mod.zipPath + "\nError " + str(FileAccess.get_open_error()))
+				shutdown("Failed to copy\n" + fname + "\nto\n" + outPath + "\nfrom mod " + mod.name + "\nError " + str(FileAccess.get_open_error()))
 				return
 			outf.store_buffer(buf)
 			outf.close()
-
-	# Dump the project.godot
-	var dumperPid = OS.create_process(runExec, ["--headless", "--quit", "-s", "ProjectDumper.gd", "--path", runDir, "--main-pack", runPck], false)
-	if dumperPid == -1:
-		shutdown("Failed to dump project")
-		return
-
-	while OS.is_process_running(dumperPid):
-		await RenderingServer.frame_post_draw
 
 	var tempClassCachePath = runDir.path_join("global_script_class_cache.cfg")
 	var projectPath = runDir.path_join("project.godot")
@@ -297,7 +303,7 @@ func startGame(modded: bool = true) -> void:
 	classListCfg.load(tempClassCachePath)
 	DirAccess.remove_absolute(tempClassCachePath)
 	var classList: Array[Dictionary] = classListCfg.get_value("", "list", [])
-	for mod in Mods.mods:
+	for mod in reverseMods:
 		if mod.disabled: continue
 		if !mod.config.has_section_key("mod", "class_list"): continue
 		var modClassList = mod.config.get_value("mod", "class_list")
@@ -311,7 +317,7 @@ func startGame(modded: bool = true) -> void:
 				var classF = FileAccess.open(classOutPath, FileAccess.WRITE)
 
 				var zip = ZIPReader.new()
-				zip.open(mod.zipPath + ".zip")
+				zip.open(mod.getPath())
 				classF.store_buffer(zip.read_file(c.path.trim_prefix("res://")))
 				zip.close()
 				classF.close()
@@ -329,27 +335,27 @@ func startGame(modded: bool = true) -> void:
 	var override = ConfigFile.new()
 	# Add the mod .zip paths to be loaded by MainLoop
 	var zips = []
-	for mod in Mods.mods:
+	for mod in orderedMods:
 		if mod.disabled: continue
-		zips.append(mod.zipPath + ".zip")
+		zips.append(mod.getPath())
 	override.set_value("vostokmods", "zips", zips)
 	# Merge mod override.cfg
-	for mod in Mods.mods:
+	for mod in reverseMods:
 		if mod.disabled: continue
 		var zip = ZIPReader.new()
-		zip.open(mod.zipPath + ".zip")
+		zip.open(mod.getPath())
 		if !zip.file_exists("override.cfg"):
 			zip.close()
 			continue
 		var modCfg = ConfigFile.new()
 		err = modCfg.parse(zip.read_file("override.cfg").get_string_from_utf8())
 		if err != OK:
-			printerr("Failed to read mod override config for mod ", mod.zipPath)
+			printerr("Failed to read mod override config for mod ", mod.name)
 			zip.close()
 			continue
 		for sect in modCfg.get_sections():
 			if sect in forbiddenOverrideSections:
-				printerr("Mod ", mod.zipPath, " tried to override forbidden section ", sect, ", ignoring")
+				printerr("Mod ", mod.name, " tried to override forbidden section ", sect, ", ignoring")
 				continue
 			for k in modCfg.get_section_keys(sect):
 				override.set_value(sect, k, modCfg.get_value(sect, k))
@@ -361,7 +367,7 @@ func startGame(modded: bool = true) -> void:
 	# Load ModLoader
 	override.set_value("autoload", "ModLoader", "*res://ModLoader.gd")
 	# Load early mod autoloads
-	for mod in Mods.mods:
+	for mod in orderedMods:
 		if mod.disabled: continue
 		for al in mod.config.get_section_keys("autoload"):
 			var path = mod.config.get_value("autoload", al)
@@ -370,8 +376,8 @@ func startGame(modded: bool = true) -> void:
 	# Load built-in autoloads
 	for al in project.get_section_keys("autoload"):
 		override.set_value("autoload", al, project.get_value("autoload", al));
-	# Load late mods
-	for mod in Mods.mods:
+	# Load late mod autoloads
+	for mod in orderedMods:
 		if mod.disabled: continue
 		for al in mod.config.get_section_keys("autoload"):
 			var path = mod.config.get_value("autoload", al)
