@@ -12,5 +12,6 @@ func _init() -> void:
 		ProjectSettings.load_resource_pack(zipPath)
 
 func _initialize() -> void:
+	print(ProjectSettings.get_global_class_list())
 	print("Main loop initialized")
 	change_scene_to_file(ProjectSettings.get_setting("application/run/main_scene"))

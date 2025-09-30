@@ -41,12 +41,15 @@ layout_mode = 2
 
 [node name="StatusLabel" type="Label" parent="LoadingScreen/VBoxContainer"]
 layout_mode = 2
-text = "Launching Road to Vostok"
+text = "If you get stuck on this screen,
+create an issue here:
+github.com/Ryhon0/VostokMods/issues"
 horizontal_alignment = 1
 vertical_alignment = 1
+autowrap_mode = 2
 
 [node name="Progress" type="ProgressBar" parent="LoadingScreen/VBoxContainer"]
-custom_minimum_size = Vector2(300, 0)
+custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 max_value = 1.0
 

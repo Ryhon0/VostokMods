@@ -62,7 +62,8 @@ func saveConfig():
 	f.flush()
 	f.close()
 
-func shutdown():
+func shutdown(msg: String = "Shutting down"):
+	StatusLabel.text = msg
 	Progress.value = 1.0
 	Progress.max_value = 1.0
 	create_tween().tween_property(Progress, "value", 0.0, 3.0)
@@ -94,6 +95,7 @@ func showLoadingScreen():
 	WindowsDeveloperScreen.hide()
 	ConfigScreen.hide()
 	
+	StatusLabel.text = "Launching Road to Vostok..."
 	LoadingScreen.show()
 
 func showWindowsDeveloperScreen():
@@ -205,8 +207,7 @@ const REPLACEME_EMPTY = "%VM_REPLACEME_EMPTY%"
 func startGame(modded: bool = true) -> void:
 	var pckPath = getGameDir().path_join(pckName)
 	if !FileAccess.file_exists(pckPath):
-		StatusLabel.text = "PCK doesn't exist " + pckPath
-		shutdown()
+		shutdown("PCK doesn't exist " + pckPath)
 		return
 
 	if !modded:
@@ -225,16 +226,14 @@ func startGame(modded: bool = true) -> void:
 	var runExec = runDir.path_join(OS.get_executable_path().get_file())
 	var err = da.create_link(OS.get_executable_path(), runExec)
 	if err != OK:
-		StatusLabel.text = "Failed to create executable symlink, error code " + str(err)
-		shutdown()
+		shutdown("Failed to create executable symlink, error code " + str(err))
 		return
 
 	# Link the game PCK to the run dir
 	var runPck = runDir.path_join(pckName)
 	err = da.create_link(pckPath, runPck)
 	if err != OK:
-		StatusLabel.text = "Failed to create PCK symlink, error code " + str(err)
-		shutdown()
+		shutdown("Failed to create PCK symlink, error code " + str(err))
 		return
 
 	# Copy main loop script and assets to run dir
@@ -256,6 +255,9 @@ func startGame(modded: bool = true) -> void:
 		var zip = ZIPReader.new()
 		zip.open(mod.zipPath + ".zip")
 		for f in zip.get_files():
+			# Ignore folders
+			if f[f.length()-1] == '/': continue
+
 			if !f.begins_with(copyFilesDir): continue
 			var fname = f.trim_prefix(copyFilesDir)
 			if !fname || !fname.length(): continue
@@ -267,29 +269,63 @@ func startGame(modded: bool = true) -> void:
 			DirAccess.make_dir_recursive_absolute(outPath.get_base_dir())
 			var buf = zip.read_file(f)
 			var outf = FileAccess.open(outPath, FileAccess.ModeFlags.WRITE)
+			if outf == null:
+				OS.shell_open(runDir)
+				shutdown("Failed to copy\n" + fname + "\nto\n" + outPath + "\nfrom mod " + mod.zipPath + "\nError " + str(FileAccess.get_open_error()))
+				return
 			outf.store_buffer(buf)
 			outf.close()
 
 	# Dump the project.godot
 	var dumperPid = OS.create_process(runExec, ["--headless", "--quit", "-s", "ProjectDumper.gd", "--path", runDir, "--main-pack", runPck], false)
 	if dumperPid == -1:
-		StatusLabel.text = "Failed to dump project"
-		shutdown()
+		shutdown("Failed to dump project")
 		return
 
 	while OS.is_process_running(dumperPid):
 		await RenderingServer.frame_post_draw
 
+	var tempClassCachePath = runDir.path_join("global_script_class_cache.cfg")
 	var projectPath = runDir.path_join("project.godot")
-	if !FileAccess.file_exists(projectPath):
-		StatusLabel.text = "Project dumper failed to dump"
-		shutdown()
+	if !FileAccess.file_exists(projectPath) && !FileAccess.file_exists(tempClassCachePath):
+		shutdown("Project dumper failed to dump")
 		return
-	var project = ConfigFile.new()
-	project.load(projectPath)
-	DirAccess.remove_absolute(projectPath)
+	
+	# Add the mod classes to the class list
+	var classCachePath = runDir.path_join(".godot/global_script_class_cache.cfg")
+	var classListCfg: ConfigFile = ConfigFile.new()
+	classListCfg.load(tempClassCachePath)
+	DirAccess.remove_absolute(tempClassCachePath)
+	var classList: Array[Dictionary] = classListCfg.get_value("", "list", [])
+	for mod in Mods.mods:
+		if mod.disabled: continue
+		if !mod.config.has_section_key("mod", "class_list"): continue
+		var modClassList = mod.config.get_value("mod", "class_list")
+		print(modClassList)
+		if modClassList is Array[Dictionary]:
+			for c in modClassList:
+				classList.append(c)
+				# Copy the file into the run dir
+				var classOutPath = runDir.path_join(c.path.trim_prefix("res://"))
+				DirAccess.make_dir_recursive_absolute(classOutPath.get_base_dir())
+				var classF = FileAccess.open(classOutPath, FileAccess.WRITE)
+
+				var zip = ZIPReader.new()
+				zip.open(mod.zipPath + ".zip")
+				classF.store_buffer(zip.read_file(c.path.trim_prefix("res://")))
+				zip.close()
+				classF.close()
+
+	# Save the class list
+	classListCfg.set_value("", "list", classList)
+	DirAccess.make_dir_recursive_absolute(classCachePath.get_base_dir())
+	var cacheListFile = FileAccess.open(classCachePath, FileAccess.WRITE)
+	cacheListFile.store_string(classListCfg.encode_to_text())
+	cacheListFile.close()
 
 	# Create override.cfg
+	var project = ConfigFile.new()
+	project.load(projectPath)
 	var override = ConfigFile.new()
 	# Add the mod .zip paths to be loaded by MainLoop
 	var zips = []
@@ -357,8 +393,7 @@ func startGame(modded: bool = true) -> void:
 	print(args)
 	var pid = OS.create_process(runExec, args, false)
 	if pid == -1:
-		StatusLabel.text = "Failed to start Road to Vostok"
-		shutdown()
+		shutdown("Failed to start Road to Vostok")
 		return
 	print("Game started with pid " + str(pid))
 	get_tree().quit()
@@ -388,24 +423,33 @@ func openDonatePage():
 
 func windowsGetRegistry(reg: String, key: String) -> String:
 	var out = []
-	OS.execute("reg.exe", ["query", reg, "/v", key, "/t", "REG_DWORD"], out)
+	var exitcode = OS.execute("reg.exe", ["query", reg, "/v", key, "/t", "REG_DWORD"], out)
+	if exitcode != 0:
+		OS.alert("reg.exe exited with " + str(exitcode))
+		return ""
 	if out.size() == 0: return ""
 	var lines = out[0].split("\r\n")
 	if lines[1] != reg: return ""
 	var split = lines[2].split(" ")
-	return split[split.size()-1]
+	return split[split.size() - 1]
 
 func windowsIsDeveloper() -> bool:
 	if OS.get_name() != "Windows": return true
-	return windowsGetRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock","AllowDevelopmentWithoutDevLicense") == "0x1"
+	return windowsGetRegistry("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock", "AllowDevelopmentWithoutDevLicense") == "0x1"
 
 func windowsOpenDeveloperSettings() -> void:
 	OS.shell_open("ms-settings:developers")
 
 func canCreateSymlinks() -> bool:
 	var tmpDir = getTempDir()
-	var tmpFile1 = tmpDir.path_join(str(randi()) + ".tmp0") 
+	var tmpFile1 = tmpDir.path_join(str(randi()) + ".tmp0")
 	var tmpFile2 = tmpFile1 + ".symlink"
 	FileAccess.open(tmpFile1, FileAccess.ModeFlags.WRITE).close()
-	var err = DirAccess.open(tmpDir).create_link(tmpFile1, tmpFile2)
+	if !DirAccess.dir_exists_absolute(tmpDir):
+		DirAccess.make_dir_recursive_absolute(tmpDir)
+	var dir = DirAccess.open(tmpDir)
+	if dir == null:
+		OS.alert("Failed to create temp dir while testing symlinks\nError " + str(DirAccess.get_open_error()))
+		return false
+	var err = dir.create_link(tmpFile1, tmpFile2)
 	return err == OK
