@@ -65,7 +65,7 @@ const githubAPIBaseURL = "https://api.github.com/"
 @onready var isWindows = OS.get_name() == "Windows"
 @onready var pckToolFilename = "godotpcktool.exe" if isWindows else "godotpcktool"
 @onready var pckToolPath = getGameDir() + "/" + pckToolFilename;
-var pckName = "Public_Demo_2_v2.pck"
+var pckName = ""
 
 func shutdown():
 	Progress.value = 1.0
@@ -105,6 +105,9 @@ func showConfigScreen():
 
 func _ready() -> void:
 	loadConfig()
+	if !Engine.is_editor_hint():
+		pckName = OS.get_executable_path().get_file().trim_suffix(".exe").trim_suffix(".x86_64") + ".pck"
+	else: pckName = "Road_to_Vostok_Demo.pck"
 
 	var f = FileAccess.open("res://VM_VERSION", FileAccess.READ)
 	version = f.get_as_text()

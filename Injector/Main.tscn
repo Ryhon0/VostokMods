@@ -1,14 +1,14 @@
 [gd_scene load_steps=10 format=3 uid="uid://b6nywv6aqxm3r"]
 
-[ext_resource type="Script" path="res://Main.gd" id="1_x5slr"]
+[ext_resource type="Script" uid="uid://c1xcau5oiihc0" path="res://Main.gd" id="1_x5slr"]
 [ext_resource type="Texture2D" uid="uid://wbaqykif8euy" path="res://icon.svg" id="2_74yqq"]
-[ext_resource type="Script" path="res://Settings.gd" id="2_b0jil"]
-[ext_resource type="Script" path="res://ModList.gd" id="3_xyy35"]
+[ext_resource type="Script" uid="uid://c22wqrfo6332g" path="res://Settings.gd" id="2_b0jil"]
+[ext_resource type="Script" uid="uid://b5phpilg687c7" path="res://ModList.gd" id="3_xyy35"]
 [ext_resource type="Texture2D" uid="uid://bhyjjcpqm564o" path="res://pin.svg" id="4_rv4x7"]
 [ext_resource type="Texture2D" uid="uid://epy24urpfgha" path="res://pin_disabled.svg" id="5_33vpw"]
 [ext_resource type="Texture2D" uid="uid://bcc6fhil26kqe" path="res://donate_icon.png" id="5_r2nj5"]
 [ext_resource type="Texture2D" uid="uid://d1c10pv53ai2x" path="res://mws_logo_white.svg" id="6_0guad"]
-[ext_resource type="Script" path="res://AutoUpdater.gd" id="6_etu4i"]
+[ext_resource type="Script" uid="uid://ps3djrkoanvx" path="res://AutoUpdater.gd" id="6_etu4i"]
 
 [node name="Main" type="Control" node_paths=PackedStringArray("VersionLabel", "StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "SettingsPage", "Mods", "Updater")]
 layout_mode = 3
