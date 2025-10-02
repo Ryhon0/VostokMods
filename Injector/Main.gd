@@ -15,7 +15,7 @@ class_name InjectorMain
 
 var version
 
-var pckName = "Public_Demo_2_v2.pck"
+var pckName = ""
 const configPath = "user://ModConfig.json"
 class ModLoaderConfig:
 	var customModDir: String = ""
@@ -118,6 +118,9 @@ func retrySymlinkCheck() -> void:
 
 func _ready() -> void:
 	loadConfig()
+	if !OS.is_debug_build():
+		pckName = OS.get_executable_path().get_file().trim_suffix(".exe").trim_suffix(".x86_64") + ".pck"
+	else: pckName = "Road_to_Vostok_Demo.pck"
 
 	if !OS.has_feature("editor"):
 		pckName = OS.get_executable_path().get_file().trim_suffix(".exe").trim_suffix(".x86_64") + ".pck"
@@ -302,7 +305,7 @@ func startGame(modded: bool = true) -> void:
 	var classListCfg: ConfigFile = ConfigFile.new()
 	classListCfg.load(tempClassCachePath)
 	DirAccess.remove_absolute(tempClassCachePath)
-	var classList: Array[Dictionary] = classListCfg.get_value("", "list", [])
+	var classList = classListCfg.get_value("", "list", [])
 	for mod in reverseMods:
 		if mod.disabled: continue
 		if !mod.config.has_section_key("mod", "class_list"): continue

@@ -18,10 +18,10 @@ jobs:
           fetch-depth: 1
 
       - name: "Download Godot"
-        run: wget https://github.com/godotengine/godot-builds/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip && unzip Godot_v4.3-stable_linux.x86_64.zip
+        run: wget https://github.com/godotengine/godot-builds/releases/download/4.4-stable/Godot_v4.4-stable_linux.x86_64.zip && unzip Godot_v4.4-stable_linux.x86_64.zip
 
       - name: "Create PCK"
-        run: ./Godot_v4.3-stable_linux.x86_64 --headless --path Injector --export-pack PCK "$PWD/Injector.pck"
+        run: ./Godot_v4.4-stable_linux.x86_64 --headless --path Injector --export-pack PCK "$PWD/Injector.pck"
 
       - uses: actions/upload-artifact@v4
         with:
