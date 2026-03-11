@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d1c10pv53ai2x"
-path="res://.godot/imported/mws_logo_white.svg-9e2febccbc8e44d82ff854ce9d86db63.ctex"
+path="res://.godot/imported/mws_logo_white.svg-d1c89b5c61793631fa521bd4939ce1bc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://mws_logo_white.svg"
-dest_files=["res://.godot/imported/mws_logo_white.svg-9e2febccbc8e44d82ff854ce9d86db63.ctex"]
+source_file="res://Assets/mws_logo_white.svg"
+dest_files=["res://.godot/imported/mws_logo_white.svg-d1c89b5c61793631fa521bd4939ce1bc.ctex"]
 
 [params]
 

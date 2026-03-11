@@ -19,8 +19,8 @@ run/main_scene="res://Main.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/stretch_mode=0
-boot_splash/image="res://icon.png"
-config/icon="res://icon.png"
+boot_splash/image="res://Assets/icon.png"
+config/icon="res://Assets/icon.png"
 
 [debug]
 

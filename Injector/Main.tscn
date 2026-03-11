@@ -1,14 +1,14 @@
 [gd_scene format=3 uid="uid://b6nywv6aqxm3r"]
 
-[ext_resource type="Script" uid="uid://cx62ixv7goy8j" path="res://Main.gd" id="1_x5slr"]
-[ext_resource type="Texture2D" uid="uid://wbaqykif8euy" path="res://icon.svg" id="2_74yqq"]
-[ext_resource type="Script" uid="uid://k8c55a6i17tu" path="res://Settings.gd" id="2_b0jil"]
-[ext_resource type="Script" uid="uid://b1dw88bgtmshi" path="res://ModList.gd" id="3_xyy35"]
-[ext_resource type="Texture2D" uid="uid://bhyjjcpqm564o" path="res://pin.svg" id="4_rv4x7"]
-[ext_resource type="Texture2D" uid="uid://epy24urpfgha" path="res://pin_disabled.svg" id="5_33vpw"]
-[ext_resource type="Texture2D" uid="uid://bcc6fhil26kqe" path="res://donate_icon.png" id="5_r2nj5"]
-[ext_resource type="Texture2D" uid="uid://d1c10pv53ai2x" path="res://mws_logo_white.svg" id="6_0guad"]
-[ext_resource type="Script" uid="uid://cnrym8om85mui" path="res://AutoUpdater.gd" id="6_etu4i"]
+[ext_resource type="Script" uid="uid://cx62ixv7goy8j" path="res://Scripts/Main.gd" id="1_fos0i"]
+[ext_resource type="Script" uid="uid://b1dw88bgtmshi" path="res://Scripts/ModList.gd" id="2_3dxm6"]
+[ext_resource type="Texture2D" uid="uid://wbaqykif8euy" path="res://Assets/icon.svg" id="2_74yqq"]
+[ext_resource type="Script" uid="uid://k8c55a6i17tu" path="res://Assets/Settings.gd" id="2_b0jil"]
+[ext_resource type="Texture2D" uid="uid://bhyjjcpqm564o" path="res://Assets/pin.svg" id="4_rv4x7"]
+[ext_resource type="Texture2D" uid="uid://epy24urpfgha" path="res://Assets/pin_disabled.svg" id="5_33vpw"]
+[ext_resource type="Texture2D" uid="uid://bcc6fhil26kqe" path="res://Assets/donate_icon.png" id="5_r2nj5"]
+[ext_resource type="Texture2D" uid="uid://d1c10pv53ai2x" path="res://Assets/mws_logo_white.svg" id="6_0guad"]
+[ext_resource type="Script" uid="uid://cnrym8om85mui" path="res://Scripts/AutoUpdater.gd" id="6_3dxm6"]
 
 [node name="Main" type="Control" unique_id=1926638321 node_paths=PackedStringArray("VersionLabel", "StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "WindowsDeveloperScreen", "SettingsPage", "Mods", "Updater")]
 layout_mode = 3
@@ -17,7 +17,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_x5slr")
+script = ExtResource("1_fos0i")
 VersionLabel = NodePath("ConfigScreen/VBoxContainer2/CenterContainer/VBoxContainer/VersionLabel")
 StatusLabel = NodePath("LoadingScreen/VBoxContainer/StatusLabel")
 Progress = NodePath("LoadingScreen/VBoxContainer/Progress")
@@ -120,7 +120,7 @@ metadata/_tab_index = 0
 [node name="ModList" type="ScrollContainer" parent="ConfigScreen/TabContainer/Mods" unique_id=1964354579 node_paths=PackedStringArray("Main", "List")]
 layout_mode = 2
 size_flags_vertical = 3
-script = ExtResource("3_xyy35")
+script = ExtResource("2_3dxm6")
 Main = NodePath("../../../..")
 List = NodePath("ModListTree")
 PinIcon = ExtResource("4_rv4x7")
@@ -305,7 +305,7 @@ theme_override_font_sizes/font_size = 24
 text = "Launch"
 
 [node name="AutoUpdater" type="Node" parent="." unique_id=2005651094 node_paths=PackedStringArray("Main")]
-script = ExtResource("6_etu4i")
+script = ExtResource("6_3dxm6")
 Main = NodePath("..")
 
 [connection signal="pressed" from="WindowsDeveloperScreen/VBoxContainer/HBoxContainer/Button" to="." method="windowsOpenDeveloperSettings"]
@@ -319,5 +319,4 @@ Main = NodePath("..")
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/DonateButton" to="." method="openDonatePage"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/ModsDirButton" to="." method="openMods"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/UserDirButton" to="." method="openUser"]
-[connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button3" to="." method="injectAndLaunch" binds= [false]]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button" to="." method="injectAndLaunch"]
