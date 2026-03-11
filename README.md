@@ -1,11 +1,7 @@
 # Vostok Mods
-This is an experimental mod loader for Road to Vostok.  
-RTV doesn't natively support mods, so we need to inject a script that loads other PCKs and runs other scripts.  
-The mod loader can be injected using one of the 2 options:  
-* **(Currently used)** Modifying the `user://Preferences.tres` save file to reference a subresource script.  
-* **(Not implemented)** Injecting a custom main loop using [GodotPckTool](https://github.com/hhyyrylainen/GodotPckTool)   and running it with `--script`  
-
-Mod PCKs (or ZIPs) will overwrite existing game files at runtime. Partial patches are not supported.  
+This is an unofficial mod loader for [Road to Vostok](https://roadtovostok.com/).  
+This project only loads assets and code into the game, it does not provide any APIs to interface with the game.  
+Mod developers are expected to use Godot's built-in systems to create mods. To interface with the game's code, decompile the game and interact with the scripts like in a regular script.  
 
 ## Installation
 * Go to the [releases page](https://github.com/Ryhon0/VostokMods/releases)  
