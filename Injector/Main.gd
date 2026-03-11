@@ -336,11 +336,18 @@ func startGame(modded: bool = true) -> void:
 	var project = ConfigFile.new()
 	project.load(projectPath)
 	var override = ConfigFile.new()
-	# Add the mod .zip paths to be loaded by MainLoop
+	# Add the mod .vmz paths to be loaded by MainLoop
 	var zips = []
+	var runModsDirPath = runDir.path_join("mods")
+	DirAccess.make_dir_recursive_absolute(runModsDirPath)
+	var runModsDir = DirAccess.open(runModsDirPath)
 	for mod in orderedMods:
 		if mod.disabled: continue
-		zips.append(mod.getPath())
+		# Resource packs must have a .zip extension, a symlink with a .zip extension is created in the run dir
+		var vmzPath : String = mod.getPath()
+		var zipPath : String = runModsDirPath.path_join(vmzPath.get_file()).trim_suffix(".vmz") + ".zip"
+		runModsDir.create_link(vmzPath, zipPath)
+		zips.append(zipPath)
 	override.set_value("vostokmods", "zips", zips)
 	# Merge mod override.cfg
 	for mod in reverseMods:

@@ -12,7 +12,7 @@ class_name ModList
 var mods : Array[ModInfo] = []
 
 class ModInfo:
-	# Name of the mod file without the X- priority prefix and .zip/.zip.disabled extension
+	# Name of the mod file without the X- priority prefix and .vmz/.vmz.disabled extension
 	var name : String
 
 	var priority : int
@@ -82,7 +82,7 @@ class ModInfo:
 		if priority != 0:
 			path += str(priority) + "-"
 		
-		path += name + ".zip"
+		path += name + ".vmz"
 		if disabled:
 			path += ".disabled"
 		return modsDir.path_join(path)
@@ -131,11 +131,11 @@ func loadMods():
 	for f in da.get_files():
 		var zipname = f
 		var disabled = false
-		if f.ends_with(".zip.disabled"):
-			zipname = f.substr(0, f.length() - ".zip.disabled".length())
+		if f.ends_with(".vmz.disabled"):
+			zipname = f.substr(0, f.length() - ".vmz.disabled".length())
 			disabled = true
-		elif f.ends_with(".zip"):
-			zipname = f.substr(0, f.length() - ".zip".length())
+		elif f.ends_with(".vmz"):
+			zipname = f.substr(0, f.length() - ".vmz".length())
 			disabled = false
 		else:
 			continue
