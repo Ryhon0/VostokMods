@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://b6nywv6aqxm3r"]
+[gd_scene format=3 uid="uid://b6nywv6aqxm3r"]
 
 [ext_resource type="Script" uid="uid://cx62ixv7goy8j" path="res://Main.gd" id="1_x5slr"]
 [ext_resource type="Texture2D" uid="uid://wbaqykif8euy" path="res://icon.svg" id="2_74yqq"]
@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://d1c10pv53ai2x" path="res://mws_logo_white.svg" id="6_0guad"]
 [ext_resource type="Script" uid="uid://cnrym8om85mui" path="res://AutoUpdater.gd" id="6_etu4i"]
 
-[node name="Main" type="Control" node_paths=PackedStringArray("VersionLabel", "StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "WindowsDeveloperScreen", "SettingsPage", "Mods", "Updater")]
+[node name="Main" type="Control" unique_id=1926638321 node_paths=PackedStringArray("VersionLabel", "StatusLabel", "Progress", "LoadingScreen", "ConfigScreen", "WindowsDeveloperScreen", "SettingsPage", "Mods", "Updater")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,7 +28,7 @@ SettingsPage = NodePath("ConfigScreen/TabContainer/Settings")
 Mods = NodePath("ConfigScreen/TabContainer/Mods/ModList")
 Updater = NodePath("AutoUpdater")
 
-[node name="LoadingScreen" type="CenterContainer" parent="."]
+[node name="LoadingScreen" type="CenterContainer" parent="." unique_id=271971104]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -36,10 +36,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="LoadingScreen"]
+[node name="VBoxContainer" type="VBoxContainer" parent="LoadingScreen" unique_id=113091957]
 layout_mode = 2
 
-[node name="StatusLabel" type="Label" parent="LoadingScreen/VBoxContainer"]
+[node name="StatusLabel" type="Label" parent="LoadingScreen/VBoxContainer" unique_id=785085572]
 layout_mode = 2
 text = "If you get stuck on this screen,
 create an issue here:
@@ -48,12 +48,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="Progress" type="ProgressBar" parent="LoadingScreen/VBoxContainer"]
+[node name="Progress" type="ProgressBar" parent="LoadingScreen/VBoxContainer" unique_id=373820890]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 max_value = 1.0
 
-[node name="WindowsDeveloperScreen" type="CenterContainer" parent="."]
+[node name="WindowsDeveloperScreen" type="CenterContainer" parent="." unique_id=2087353417]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -62,18 +62,18 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="WindowsDeveloperScreen"]
+[node name="VBoxContainer" type="VBoxContainer" parent="WindowsDeveloperScreen" unique_id=478722178]
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="Label" type="Label" parent="WindowsDeveloperScreen/VBoxContainer"]
+[node name="Label" type="Label" parent="WindowsDeveloperScreen/VBoxContainer" unique_id=171399580]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Windows developer mode is not enabled!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Label2" type="Label" parent="WindowsDeveloperScreen/VBoxContainer"]
+[node name="Label2" type="Label" parent="WindowsDeveloperScreen/VBoxContainer" unique_id=2048430276]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -87,19 +87,19 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="WindowsDeveloperScreen/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="WindowsDeveloperScreen/VBoxContainer" unique_id=143552132]
 layout_mode = 2
 alignment = 1
 
-[node name="Button" type="Button" parent="WindowsDeveloperScreen/VBoxContainer/HBoxContainer"]
+[node name="Button" type="Button" parent="WindowsDeveloperScreen/VBoxContainer/HBoxContainer" unique_id=2105080985]
 layout_mode = 2
 text = "Open Developer Settings"
 
-[node name="Button2" type="Button" parent="WindowsDeveloperScreen/VBoxContainer/HBoxContainer"]
+[node name="Button2" type="Button" parent="WindowsDeveloperScreen/VBoxContainer/HBoxContainer" unique_id=200587488]
 layout_mode = 2
 text = "Retry"
 
-[node name="ConfigScreen" type="HBoxContainer" parent="."]
+[node name="ConfigScreen" type="HBoxContainer" parent="." unique_id=1002255422]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -108,16 +108,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TabContainer" type="TabContainer" parent="ConfigScreen"]
+[node name="TabContainer" type="TabContainer" parent="ConfigScreen" unique_id=227537295]
 layout_mode = 2
 size_flags_horizontal = 3
 current_tab = 0
 
-[node name="Mods" type="VBoxContainer" parent="ConfigScreen/TabContainer"]
+[node name="Mods" type="VBoxContainer" parent="ConfigScreen/TabContainer" unique_id=1449084987]
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="ModList" type="ScrollContainer" parent="ConfigScreen/TabContainer/Mods" node_paths=PackedStringArray("Main", "List")]
+[node name="ModList" type="ScrollContainer" parent="ConfigScreen/TabContainer/Mods" unique_id=1964354579 node_paths=PackedStringArray("Main", "List")]
 layout_mode = 2
 size_flags_vertical = 3
 script = ExtResource("3_xyy35")
@@ -127,7 +127,7 @@ PinIcon = ExtResource("4_rv4x7")
 PinIconDisabled = ExtResource("5_33vpw")
 ModWorkshopLogo = ExtResource("6_0guad")
 
-[node name="ModListTree" type="Tree" parent="ConfigScreen/TabContainer/Mods/ModList"]
+[node name="ModListTree" type="Tree" parent="ConfigScreen/TabContainer/Mods/ModList" unique_id=530642873]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -137,11 +137,11 @@ hide_root = true
 select_mode = 1
 scroll_horizontal_enabled = false
 
-[node name="ReloadModsButton" type="Button" parent="ConfigScreen/TabContainer/Mods"]
+[node name="ReloadModsButton" type="Button" parent="ConfigScreen/TabContainer/Mods" unique_id=560410026]
 layout_mode = 2
 text = "Reload Mod List"
 
-[node name="Settings" type="ScrollContainer" parent="ConfigScreen/TabContainer" node_paths=PackedStringArray("Main", "CustomModDirLine", "StartOnConfigCheckBox", "AllowAutoUpdateCheckBox", "AllowModAutoUpdatesCheckBox", "AutoUpdateDisabledModsCheckBox", "PreReleaseLoaderCheckBox")]
+[node name="Settings" type="ScrollContainer" parent="ConfigScreen/TabContainer" unique_id=717914735 node_paths=PackedStringArray("Main", "CustomModDirLine", "StartOnConfigCheckBox", "AllowAutoUpdateCheckBox", "AllowModAutoUpdatesCheckBox", "AutoUpdateDisabledModsCheckBox", "PreReleaseLoaderCheckBox")]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
@@ -155,109 +155,109 @@ AutoUpdateDisabledModsCheckBox = NodePath("VBoxContainer/GridContainer/DisabledM
 PreReleaseLoaderCheckBox = NodePath("VBoxContainer/GridContainer/PreReleaseLoaderCheckBox")
 metadata/_tab_index = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/TabContainer/Settings"]
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/TabContainer/Settings" unique_id=656997158]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="GridContainer" type="GridContainer" parent="ConfigScreen/TabContainer/Settings/VBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="ConfigScreen/TabContainer/Settings/VBoxContainer" unique_id=1376771691]
 layout_mode = 2
 theme_override_constants/h_separation = 16
 columns = 2
 
-[node name="Label" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="Label" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer" unique_id=112723561]
 layout_mode = 2
 text = "Custom mod directory"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer" unique_id=511738735]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CustomModDirLine" type="LineEdit" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer"]
+[node name="CustomModDirLine" type="LineEdit" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer" unique_id=843936132]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Defaults to (game dir)/mods"
 
-[node name="Button" type="Button" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer"]
+[node name="Button" type="Button" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer" unique_id=1233722122]
 layout_mode = 2
 text = "..."
 
-[node name="Label2" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="Label2" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer" unique_id=1885140027]
 layout_mode = 2
 text = "Start on config screen"
 
-[node name="ConfigStartCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="ConfigStartCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer" unique_id=419749865]
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="Label3" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="Label3" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer" unique_id=1545276478]
 layout_mode = 2
 text = "Automatically update mod loader"
 
-[node name="LoaderUpdatesCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="LoaderUpdatesCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer" unique_id=126385767]
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="Label6" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="Label6" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer" unique_id=1321857042]
 layout_mode = 2
 text = "Download testing versions of the loader"
 
-[node name="PreReleaseLoaderCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="PreReleaseLoaderCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer" unique_id=1588147596]
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="Label4" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="Label4" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer" unique_id=1329280920]
 layout_mode = 2
 text = "Automatically update mods"
 
-[node name="ModUpdatesCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="ModUpdatesCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer" unique_id=1847142938]
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="Label5" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="Label5" type="Label" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer" unique_id=963023606]
 layout_mode = 2
 text = "Automatically update disabled mods"
 
-[node name="DisabledModUpdatesCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer"]
+[node name="DisabledModUpdatesCheckBox" type="CheckBox" parent="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer" unique_id=1636905381]
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="ConfigScreen"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="ConfigScreen" unique_id=837696879]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
-[node name="CenterContainer" type="CenterContainer" parent="ConfigScreen/VBoxContainer2"]
+[node name="CenterContainer" type="CenterContainer" parent="ConfigScreen/VBoxContainer2" unique_id=2099781538]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/VBoxContainer2/CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfigScreen/VBoxContainer2/CenterContainer" unique_id=1685403887]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="TextureRect" type="TextureRect" parent="ConfigScreen/VBoxContainer2/CenterContainer/VBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="ConfigScreen/VBoxContainer2/CenterContainer/VBoxContainer" unique_id=2133995834]
 custom_minimum_size = Vector2(0, 128)
 layout_mode = 2
 texture = ExtResource("2_74yqq")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="ConfigScreen/VBoxContainer2/CenterContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="ConfigScreen/VBoxContainer2/CenterContainer/VBoxContainer" unique_id=62695043]
 layout_mode = 2
 text = "VostokMods Injector"
 horizontal_alignment = 1
 
-[node name="VersionLabel" type="Label" parent="ConfigScreen/VBoxContainer2/CenterContainer/VBoxContainer"]
+[node name="VersionLabel" type="Label" parent="ConfigScreen/VBoxContainer2/CenterContainer/VBoxContainer" unique_id=1323340964]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 0.5)
 text = "Version x.x.x"
 horizontal_alignment = 1
 
-[node name="Button2" type="Button" parent="ConfigScreen/VBoxContainer2"]
+[node name="DonateButton" type="Button" parent="ConfigScreen/VBoxContainer2" unique_id=198096099]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 expand_icon = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ConfigScreen/VBoxContainer2/Button2"]
+[node name="HBoxContainer" type="HBoxContainer" parent="ConfigScreen/VBoxContainer2/DonateButton" unique_id=288907516]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -266,45 +266,45 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="TextureRect" type="TextureRect" parent="ConfigScreen/VBoxContainer2/Button2/HBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="ConfigScreen/VBoxContainer2/DonateButton/HBoxContainer" unique_id=1874887343]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 texture = ExtResource("5_r2nj5")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="ConfigScreen/VBoxContainer2/Button2/HBoxContainer"]
+[node name="Label" type="Label" parent="ConfigScreen/VBoxContainer2/DonateButton/HBoxContainer" unique_id=2059392400]
 layout_mode = 2
 text = "Donate"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ConfigScreen/VBoxContainer2"]
+[node name="HBoxContainer" type="HBoxContainer" parent="ConfigScreen/VBoxContainer2" unique_id=545364848]
 layout_mode = 2
 
-[node name="Button" type="Button" parent="ConfigScreen/VBoxContainer2/HBoxContainer"]
+[node name="ModsDirButton" type="Button" parent="ConfigScreen/VBoxContainer2/HBoxContainer" unique_id=671294337]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Open mods"
 
-[node name="Button2" type="Button" parent="ConfigScreen/VBoxContainer2/HBoxContainer"]
+[node name="UserDirButton" type="Button" parent="ConfigScreen/VBoxContainer2/HBoxContainer" unique_id=539481802]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Open user://"
 
-[node name="Button3" type="Button" parent="ConfigScreen/VBoxContainer2"]
+[node name="Button3" type="Button" parent="ConfigScreen/VBoxContainer2" unique_id=2043039739]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Launch without mods"
 
-[node name="Button" type="Button" parent="ConfigScreen/VBoxContainer2"]
+[node name="Button" type="Button" parent="ConfigScreen/VBoxContainer2" unique_id=1803824494]
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Launch"
 
-[node name="AutoUpdater" type="Node" parent="." node_paths=PackedStringArray("Main")]
+[node name="AutoUpdater" type="Node" parent="." unique_id=2005651094 node_paths=PackedStringArray("Main")]
 script = ExtResource("6_etu4i")
 Main = NodePath("..")
 
@@ -316,8 +316,8 @@ Main = NodePath("..")
 [connection signal="item_edited" from="ConfigScreen/TabContainer/Mods/ModList/ModListTree" to="ConfigScreen/TabContainer/Mods/ModList" method="itemEdited"]
 [connection signal="pressed" from="ConfigScreen/TabContainer/Mods/ReloadModsButton" to="ConfigScreen/TabContainer/Mods/ModList" method="loadMods"]
 [connection signal="pressed" from="ConfigScreen/TabContainer/Settings/VBoxContainer/GridContainer/HBoxContainer/Button" to="ConfigScreen/TabContainer/Settings" method="openModDirDialog"]
-[connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button2" to="." method="openDonatePage"]
-[connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/Button" to="." method="openMods"]
-[connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/Button2" to="." method="openUser"]
+[connection signal="pressed" from="ConfigScreen/VBoxContainer2/DonateButton" to="." method="openDonatePage"]
+[connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/ModsDirButton" to="." method="openMods"]
+[connection signal="pressed" from="ConfigScreen/VBoxContainer2/HBoxContainer/UserDirButton" to="." method="openUser"]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button3" to="." method="injectAndLaunch" binds= [false]]
 [connection signal="pressed" from="ConfigScreen/VBoxContainer2/Button" to="." method="injectAndLaunch"]

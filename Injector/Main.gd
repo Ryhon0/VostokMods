@@ -16,6 +16,7 @@ class_name InjectorMain
 var version
 
 var pckName = ""
+const defaultPckName = "RTV.pck";
 const configPath = "user://ModConfig.json"
 class ModLoaderConfig:
 	var customModDir: String = ""
@@ -88,7 +89,7 @@ func showHttpProgress(httpReq: HTTPRequest):
 
 func getGameDir() -> String:
 	if OS.has_feature("editor"):
-		return ProjectSettings.globalize_path("res://").get_base_dir().get_base_dir() + "/"
+		return ProjectSettings.globalize_path("res://").get_base_dir().get_base_dir().get_base_dir() + "/"
 	return OS.get_executable_path().get_base_dir() + "/"
 
 func showLoadingScreen():
@@ -120,7 +121,7 @@ func _ready() -> void:
 	loadConfig()
 	if !OS.is_debug_build():
 		pckName = OS.get_executable_path().get_file().trim_suffix(".exe").trim_suffix(".x86_64") + ".pck"
-	else: pckName = "Road_to_Vostok_Demo.pck"
+	else: pckName = defaultPckName
 
 	if !OS.has_feature("editor"):
 		pckName = OS.get_executable_path().get_file().trim_suffix(".exe").trim_suffix(".x86_64") + ".pck"
@@ -132,7 +133,7 @@ func _ready() -> void:
 
 	Mods.loadMods()
 	showLoadingScreen()
-	if !OS.has_feature("editor") and config.allowAutoUpdate:
+	if !OS.has_feature("editor") and config.allowAutoUpdate and !FileAccess.file_exists(".nolauncherupdate"):
 		await Updater.checkInjectorUpdate()
 	else:
 		await Updater.checkModUpdates()
@@ -161,8 +162,11 @@ func getModsDir() -> String:
 func openMods() -> void:
 	OS.shell_show_in_file_manager(getModsDir())
 
+func getUserDir() -> String:
+	return OS.get_data_dir().path_join("Road to Vostok Demo")
+
 func openUser() -> void:
-	OS.shell_show_in_file_manager(OS.get_user_data_dir())
+	OS.shell_show_in_file_manager(getUserDir())
 
 var isLaunching = false
 var launchTimer: Timer

@@ -8,7 +8,7 @@ func _init() -> void:
 		return
 	
 	for zipPath in ProjectSettings.get_setting("vostokmods/zips"):
-		print("Loading ZIP ", zipPath)
+		print("Loading ZIP " + zipPath)
 		ProjectSettings.load_resource_pack(zipPath)
 
 func _initialize() -> void:
