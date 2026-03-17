@@ -96,7 +96,6 @@ func showLoadingScreen():
 	WindowsDeveloperScreen.hide()
 	ConfigScreen.hide()
 	
-	StatusLabel.text = "Launching Road to Vostok..."
 	LoadingScreen.show()
 
 func showWindowsDeveloperScreen():
