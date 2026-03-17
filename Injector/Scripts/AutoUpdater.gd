@@ -11,17 +11,18 @@ func checkInjectorUpdate():
 	if FileAccess.file_exists(deletemePath):
 		DirAccess.remove_absolute(deletemePath)
 
+	Main.StatusLabel.text = "Checking for updates"
+
 	var httpReq = HTTPRequest.new()
 	add_child(httpReq)
-	var err = httpReq.request(Main.githubAPIBaseURL + "repos/Ryhon0/VostokMods/releases", ["accept: application/vnd.github+json"])
+	var updateUrl = "https://api.github.com/" + "repos/Ryhon0/VostokMods/releases"
+	var err = httpReq.request(updateUrl, ["accept: application/vnd.github+json"])
 	if err != OK:
 		push_error("Failed to create mod loader releases request ", err)
 		await checkModUpdates()
 		return
 
-	Main.StatusLabel.text = "Checking for updates"
 	Main.showHttpProgress(httpReq)
-
 	httpReq.request_completed.connect(injectorReleasesRequestCompleted)
 
 func injectorReleasesRequestCompleted(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray):
