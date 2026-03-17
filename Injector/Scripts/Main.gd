@@ -254,10 +254,13 @@ func startGame(modded: bool = true) -> void:
 		srcFa.close()
 
 	# Dump the project.godot
-	var dumperPid = OS.create_process(runExec, ["--headless", "--quit", "-s", "ProjectDumper.gd", "--path", runDir, "--main-pack", runPck], false)
+	var dumperArgs = ["--headless", "--quit", "-s", "ProjectDumper.gd", "--path", runDir, "--main-pack", runPck]
+	print("Dumping project with " + str(dumperArgs))
+	var dumperPid = OS.create_process(runExec, dumperArgs, false)
 	if dumperPid == -1:
 		shutdown("Failed to dump project")
 		return
+	print("Created dumper process with pid " + str(dumperPid))
 
 	while OS.is_process_running(dumperPid):
 		await RenderingServer.frame_post_draw
@@ -415,7 +418,7 @@ func startGame(modded: bool = true) -> void:
 	# Run the game
 	var args = ["-s", "MainLoop.gd", "--path", runDir, "--main-pack", runPck, "--rendering-driver", displayDriver, "--"]
 	args.append_array(OS.get_cmdline_user_args())
-	print(args)
+	print("Launching game with args " + str(args))
 	var pid = OS.create_process(runExec, args, false)
 	if pid == -1:
 		shutdown("Failed to start Road to Vostok")
