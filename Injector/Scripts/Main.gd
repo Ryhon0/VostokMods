@@ -218,7 +218,9 @@ func startGame(modded: bool = true) -> void:
 		return
 
 	if !modded:
-		var pureArgs = ["--main-pack", pckPath, "--"]
+		# Use the same renderer as injector
+		var displayDriver = RenderingServer.get_current_rendering_driver_name()
+		var pureArgs = ["--main-pack", pckPath, "--rendering-driver", displayDriver, "--"]
 		pureArgs.append_array(OS.get_cmdline_user_args())
 		OS.create_process(OS.get_executable_path(), pureArgs, false)
 		get_tree().quit()
@@ -407,8 +409,11 @@ func startGame(modded: bool = true) -> void:
 	fa.store_string(overrideStr)
 	fa.close()
 
+	# Use the same renderer as injector
+	var displayDriver = RenderingServer.get_current_rendering_driver_name()
+
 	# Run the game
-	var args = ["-s", "MainLoop.gd", "--path", runDir, "--main-pack", runPck, "--"]
+	var args = ["-s", "MainLoop.gd", "--path", runDir, "--main-pack", runPck, "--rendering-driver", displayDriver, "--"]
 	args.append_array(OS.get_cmdline_user_args())
 	print(args)
 	var pid = OS.create_process(runExec, args, false)
