@@ -5,14 +5,14 @@ Mod developers are expected to use Godot's built-in systems to create mods. To i
 
 ## Installation
 * Go to the [releases page](https://github.com/Ryhon0/VostokMods/releases)  
-* Download the `Injector.pck` file from the latest release  
+* Download the `Injector.pck` and `RTV.exe` files from the latest release  
 * Right click Road to Vostok in your Steam library and select "Manage>Browse local files"
-* Move the downloaded file into the folder
+* Move the downloaded files into the folder. Replace files if prompted.
 * Right click Road to Vostok again and select "Properties..."
 * In the "General" tab, set the launch options to `--main-pack Injector.pck`  
 * The mod loader is now installed  
 
-To install mods, move the mod .ZIPs into the `mods` folder in the game directory.  
+To install mods, move the mod .VMZ files into the `mods` folder in the game directory.  
 
 ## Creating mods
 [Moved to the wiki](https://github.com/Ryhon0/VostokMods/wiki)
